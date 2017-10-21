@@ -21,8 +21,8 @@ public class ZiplineLab {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final Port usPort = LocalEV3.get().getPort("S1");
-	private static final Port colorPort=LocalEV3.get().getPort("S4");
+	private static final Port usPort = LocalEV3.get().getPort("S4");
+	private static final Port colorPort=LocalEV3.get().getPort("S3");
 	private static boolean isFallingEdge;
 
 	/**
@@ -37,7 +37,7 @@ public class ZiplineLab {
 		final TextLCD t=LocalEV3.get().getTextLCD();
 		Odometer odometer=new Odometer(leftMotor,rightMotor);
 		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
-
+		Navigation navigator = new Navigation(leftMotor, rightMotor, odometer);
 		LightLocalization lightLocalizer;
 
 
@@ -183,8 +183,11 @@ public class ZiplineLab {
 		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
 		t.drawString(" CONFIRMED   ", 0, 3);
 		
+	
+		
 		Button.waitForAnyPress();
-		usLocalizer.doLocalization();	
+		//usLocalizer.doLocalization();
+		navigator.travelTo(xc, yc);
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
 		System.exit(0);

@@ -17,8 +17,8 @@ public class Navigation {
 	//start a 2D array of waypoints
 	private static int[][] waypoints=new int[][]{{2,1},{1,1},{1,2},{2,0}};
 	
-	private static final int FORWARD_SPEED = 80;
-	private static final int ROTATE_SPEED = 80;
+	private static final int FORWARD_SPEED = 300;
+	private static final int ROTATE_SPEED = 70;
 	private static final double WHEEL_RADIUS=2.2;
 	private static final double TRACK= 9.88;
 	private static final double SQRTLENGTH=30.48;
@@ -56,27 +56,41 @@ public class Navigation {
 		 * @param y
 		 * @return nothing
 		 */
-		public void travelTo(double x, double y) {
-			double x_diff=x-odometer.getX();
-			double y_diff=y-odometer.getY();
-			double dtheta=Math.atan2(x_diff,y_diff)*180/Math.PI;
-			double nowtheta=odometer.getTheta();
-			double turntheta=dtheta-nowtheta;
-			double distance=Math.sqrt(Math.pow(x_diff, 2)+Math.pow(y_diff, 2));
-			
-
-			if(turntheta<-180) {
-				turntheta=turntheta+360;
-			}
-
-			else if(turntheta>180) {
-				turntheta=turntheta-360;
-			}
-
-			turnTo(turntheta);
-			goForward(distance);
-
+	public void travelTo(double x, double y) {
+		x= -x*30.48;
+		y= y*30.48;
+		
+		double deltaX = x - odometer.getX();
+		double deltaY = y - odometer.getY();
+		
+		
+		// calculate the minimum angle
+		double minAngle = Math.toDegrees(Math.atan2(deltaX, deltaY)) - odometer.getThetaDegrees();
+		
+		// Adjust the angle to make sure it takes the min angle
+		if (minAngle < -180) {
+			minAngle = 360 + minAngle;
+		} else if (minAngle > 180) {
+			minAngle = minAngle - 360;
 		}
+		
+		// turn to the minimum angle
+		turnTo(minAngle);
+		
+		// calculate the distance to next point
+		double distance  = Math.hypot(deltaX, deltaY);
+		
+		// move to the next point
+		leftMotor.setSpeed(FORWARD_SPEED);
+		rightMotor.setSpeed(FORWARD_SPEED);
+		leftMotor.rotate(distanceConvert(WHEEL_RADIUS,distance), true);
+		rightMotor.rotate(distanceConvert(WHEEL_RADIUS, distance), false);
+
+		leftMotor.stop(true);
+		rightMotor.stop(true);
+		leftMotor.setSpeed(0);
+		rightMotor.setSpeed(0);
+	}
 		
 		/**
 		 *  Method that causes the robot to turn on itself to the absolute heading theta. 
