@@ -5,165 +5,115 @@ import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.ColorDetector;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
 public class LightLocalization {
-	private final int FOWARD_SPEED=80;
-	//offset from center of wheel to lightsensor
-	private final double OFFSET= 7;
+	private final int FORWARD_SPEED = 80;
 	private Odometer odometer;
-	private SampleProvider colorSensor;
-	private float[] colorSample;
-	private final int TANGLE=30;
+	private EV3ColorSensor colorSensor;
+	private int sampleSize = 100;
+	private float[] samples = new float[sampleSize];
 	private EV3LargeRegulatedMotor leftMotor;
 	private EV3LargeRegulatedMotor rightMotor;
 	private Navigation navigation;
 	private TextLCD LCD = LocalEV3.get().getTextLCD();
 
 	/**
-	 * Constructor of the class LightLocalization 
-	 * uses the following parameters to locate the position of the robot, and move the robot 
-	 * to the origin of the grid 
+	 * Constructor of the class LightLocalization uses the following parameters to
+	 * locate the position of the robot, and move the robot to the origin of the
+	 * grid
+	 * 
 	 * @param odometer
 	 * @param colorSample
 	 * @param colorSensor
 	 * @param leftMotor
 	 * @param rightMotor
 	 */
-	public LightLocalization(Odometer odometer, float[] colorSample, SampleProvider colorSensor,
-			EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor ) {
-		this.odometer=odometer;
-		this.colorSensor=colorSensor;
-		this.colorSample=colorSample;
-		this.leftMotor=leftMotor;
-		this.rightMotor=rightMotor;
+	public LightLocalization(Odometer odometer, EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor) {
+		this.odometer = odometer;
+		colorSensor = new EV3ColorSensor(SensorPort.S4);
+		this.leftMotor = leftMotor;
+		this.rightMotor = rightMotor;
 		this.leftMotor.setAcceleration(300);
 		this.rightMotor.setAcceleration(300);
-		navigation =new Navigation(leftMotor,rightMotor,odometer);
+		navigation = new Navigation(leftMotor, rightMotor, odometer);
 
 	}
+
 	/**
-	 * run method that move the robot to the origin
-	 * it uses the lightSensor to localize its position on the grid, and travels to the origin
+	 * run method that move the robot to the origin it uses the lightSensor to
+	 * localize its position on the grid, and travels to the origin
+	 * 
 	 * @return nothing
 	 */
 	public void doLocalization() {
-
-		int counter=0;
-
+		int counter = 0;
+		boolean isNavigating = true;
+		double thetaOneX = 0, thetaTwoX = 0, thetaOneY = 0, thetaTwoY = 0, deltaX, deltaY;
 		do {
-			navigation.turnTo(TANGLE);
-			while(counter<2) {
-				leftMotor.forward();
-				rightMotor.forward();
-				if(getColorChange()) {
-					Sound.beep();
-					counter=counter+1;
-				}
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			navigation.turnTo(-TANGLE);
-			odometer.setPosition(new double [] {0.0, 0.0, 0}, new boolean [] {true, true, true});
 
-			double x, y, theta_x, theta_y;
-			double theta_1=0;
-			double theta_2=0;
-			double theta_3=0;
-			double theta_4=0;
-
-			boolean firstLine=true;
-			boolean secondLine=true;
-			boolean thirdLine=true;
-			boolean fourthLine=true;
-
-
-			leftMotor.setSpeed(FOWARD_SPEED);
-			rightMotor.setSpeed(FOWARD_SPEED);
-			//rotate clockwise
+			leftMotor.setSpeed(FORWARD_SPEED);
+			rightMotor.setSpeed(FORWARD_SPEED);
 			leftMotor.forward();
 			rightMotor.backward();
-			while(firstLine) {
-				if(getColorChange()) {
-					Sound.beep();
-
-					//keep note of the theta when light sensor first intersect the positive y-axis
-					theta_1=odometer.getTheta();
-					firstLine=false;
+			while (isNavigating) {
+				if (isBlack()) {
+					counter++;
+					// obtain theta values at each line crossing
+					if (counter == 1) {
+						Sound.beep();
+						thetaOneX = odometer.getTheta();
+					} else if (counter == 2) {
+						Sound.beep();
+						thetaOneY = odometer.getTheta();
+					} else if (counter == 3) {
+						Sound.beep();
+						thetaTwoX = odometer.getTheta();
+						deltaX = thetaTwoX - thetaOneX;
+						// use formula provided
+						// this.y = -d * Math.cos(deltaX / 2);
+						// set y so we can use the travelTo method
+					} else if (counter == 4) {
+						Sound.beep();
+						isNavigating = false;
+						thetaTwoY = odometer.getTheta();
+						deltaY = thetaTwoY - thetaOneY;
+						// use formula provided
+						// this.x = -d * Math.cos(deltaY / 2);
+						// set x so we can use travelTo method
+					}
+					if (!isNavigating) {
+						double angler = odometer.getTheta();
+						navigation.turnTo(360-angler);
+						leftMotor.stop();
+						rightMotor.stop();
+					}
 				}
 			}
-			while(secondLine) {
-				if(getColorChange()) {
-					Sound.beep();
-
-					//keep note of the theta when light sensor intersect the positive x-axis
-					theta_2=odometer.getTheta();
-					secondLine=false;
-				}
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			while(thirdLine) {
-				if(getColorChange()) {
-					Sound.beep();
-					//keep note of the theta when light sensor first intersect the negative y-axis
-					theta_3=odometer.getTheta();
-					thirdLine=false;
-				}
-			}
-			while(fourthLine) {
-				if(getColorChange()) {
-					Sound.beep();
-					//keep note of the theta when light sensor intersect the negative x-axis
-					theta_4=odometer.getTheta();
-					fourthLine=false;
-				}
-			}
-			//stop the robot when it catches the last line
-			leftMotor.stop();
-			rightMotor.stop();
+		} while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 
-			theta_x=Math.abs(theta_4-theta_2);
-			theta_y=Math.abs(theta_3-theta_1);
-			LCD.clear();
-
-			x=-OFFSET*Math.cos(theta_y*Math.PI/360);
-			y=-OFFSET*Math.cos(theta_x*Math.PI/360);
-
-			LCD.drawString("X="+x, 0, 6);
-			LCD.drawString("Y="+y, 0, 7);
-			LCD.drawString("Theta1:"+theta_1,0, 5);
-			LCD.drawString("Theta2"+theta_2, 0, 4);
-			odometer.setX(x);
-			odometer.setY(y);
-			
-			//the robot travels to the origin
-			navigation.travelTo(0,0);
-			//make the robot turn to 0 degree
-			double nowT=odometer.getTheta();
-			navigation.turnTo(-nowT);
-
-		} while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
-		System.exit(0);
 	}
 
 	/**
-	 * method that collects the data from the lightSensor and checks if there is a change in color 
-	 * from a beige square to a black line
-	 * @return boolean, if there is a change in the color, return true
-	 * if there is not change, meaning still on the beige square, return false
+	 * method that collects the data from the lightSensor and checks if there is a
+	 * change in color from a beige square to a black line
+	 * 
+	 * @return boolean, if there is a change in the color, return true if there is
+	 *         not change, meaning still on the beige square, return false
 	 */
-	private boolean getColorChange() {
-		colorSensor.fetchSample(colorSample, 0);
-		boolean colorChange=false;
-		int color= (int) colorSample[0] ;
-		if(color==13) {
-			colorChange=true;
-		}
-		return colorChange;
+	private boolean isBlack() {
+		colorSensor.getRedMode().fetchSample(samples, 0);
+		System.out.println(samples[0]);
+		return samples[0] <= 0.2;
 	}
 }

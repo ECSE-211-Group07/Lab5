@@ -29,7 +29,6 @@ public class LocalizationLab {
 	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
-	private static final Port colorPort=LocalEV3.get().getPort("S4");
 	private static boolean isFallingEdge;
 
 	/**
@@ -50,13 +49,10 @@ public class LocalizationLab {
 
 		//created for the distance measured
 		//@SuppressWarnings("resource") // Because we don't bother to close this resource
-		SensorModes colorSensor= new EV3ColorSensor(colorPort);
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
 		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
-		SampleProvider colorValue=colorSensor.getMode("Red");
 		// this instance
 		float[] usData = new float[usDistance.sampleSize()];
-		float[] lightValue=new float[colorValue.sampleSize()];
 		// usData is the buffer in which data are
 		// returned  
 		do {
@@ -107,7 +103,7 @@ public class LocalizationLab {
 
 			buttonChoice=Button.waitForAnyPress();
 			if(buttonChoice==Button.ID_ENTER) {
-				lightLocalizer = new LightLocalization (odometer,lightValue,colorSensor,leftMotor,rightMotor);
+				lightLocalizer = new LightLocalization (odometer,leftMotor,rightMotor);
 				lightLocalizer.doLocalization();
 			}
 		}
