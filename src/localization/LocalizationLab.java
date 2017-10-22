@@ -28,8 +28,8 @@ public class LocalizationLab {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port usPort = LocalEV3.get().getPort("S4");
-	private static final Port colorPort=LocalEV3.get().getPort("S3");
+	private static final Port usPort = LocalEV3.get().getPort("S1");
+	private static final Port colorPort=LocalEV3.get().getPort("S4");
 	private static boolean isFallingEdge;
 
 	/**
