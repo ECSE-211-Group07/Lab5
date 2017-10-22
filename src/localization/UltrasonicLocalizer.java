@@ -53,16 +53,10 @@ public class UltrasonicLocalizer {
 	 * fallingEdge() and risingEdge()
 	 * it will execute one of the following
 	 */
-public void doLocalization() {
-		//this is a falling edge 
-		if(LocalizationLab.getFallingEdge()==true) {
-			fallingEdge();
-		}
-		//this is a rising edge
-		else if(LocalizationLab.getFallingEdge()==false) {
-			risingEdge();
-		}
-		}
+	public void doLocalization() {
+		fallingEdge();
+
+	}
 	
 
 	//collecting data for the distances
@@ -156,7 +150,7 @@ public void doLocalization() {
 		double currentTheta= odometer.getTheta();
 		double newtheta= dT+currentTheta;
 		LCD.drawString("Step 5", 0, 5);
-		turnTo(360-newtheta);	
+		turnTo(-newtheta);	
 	}
 
 	/**
@@ -236,10 +230,12 @@ public void doLocalization() {
 			dT= 225-(int) (thetaA+thetaB)/2;
 		}
 		LCD.drawString("DT:"+dT, 0, 3);
-		double currentTheta= odometer.getTheta();
+		double currentTheta= odometer.getThetaDegrees();
 		double newtheta=currentTheta+dT;
 		LCD.drawString("Step 5", 0, 5);
-		turnTo(360-newtheta);
+		LCD.clear();
+		LCD.drawString((Double.toString(newtheta)), 0, 1);
+		turnTo(odometer.getThetaDegrees());
 	}
 	
 	/**

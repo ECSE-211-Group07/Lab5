@@ -4,7 +4,6 @@ import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
@@ -18,12 +17,13 @@ public class ZiplineLab {
 	private float[] colorSample;
 	//create the ports
 	private static final EV3LargeRegulatedMotor leftMotor = 
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final Port usPort = LocalEV3.get().getPort("S4");
-	private static final Port colorPort=LocalEV3.get().getPort("S3");
+	private static final EV3LargeRegulatedMotor rightMotor =
+			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final Port usPort = LocalEV3.get().getPort("S1");
+	private static final Port colorPort=LocalEV3.get().getPort("S4");
 	private static boolean isFallingEdge;
+
 
 	/**
 	 * TODO
@@ -35,9 +35,9 @@ public class ZiplineLab {
 
 		//create the instances
 		final TextLCD t=LocalEV3.get().getTextLCD();
-		Odometer odometer=new Odometer(leftMotor,rightMotor);
-		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
-		Navigation navigator = new Navigation(leftMotor, rightMotor, odometer);
+		Odometer odometer = new Odometer(leftMotor,rightMotor);
+		OdometryDisplay odometryDisplay =new OdometryDisplay(odometer,t);
+		Navigator navigator = new Navigator(leftMotor, rightMotor, odometer);
 		LightLocalization lightLocalizer;
 
 
@@ -182,15 +182,13 @@ public class ZiplineLab {
 		t.clear();
 		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
 		t.drawString(" CONFIRMED   ", 0, 3);
-		
-	
-		
+		odometer.run();
 		Button.waitForAnyPress();
-		//usLocalizer.doLocalization();
-		navigator.travelTo(xc, yc);
 
-		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
+		usLocalizer.doLocalization();
+
 		System.exit(0);
+
 	}
 
 

@@ -212,6 +212,7 @@ public class Odometer extends Thread {
 			this.rightMotorTachoCount = rightMotorTachoCount;
 		}
 	}
+	
 	public double getThetaDegrees() {
 		double result;
 

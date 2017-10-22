@@ -41,7 +41,7 @@ public class LightLocalization {
 		this.rightMotor=rightMotor;
 		this.leftMotor.setAcceleration(300);
 		this.rightMotor.setAcceleration(300);
-		navigation =new Navigation(leftMotor,rightMotor,odometer);
+		this.navigation = new Navigation(leftMotor, rightMotor, odometer);
 
 	}
 	/**

@@ -39,6 +39,7 @@ public class Navigation {
 		this.odometer=odometer;
 	}
 	
+
 	public void run() {
 		for(int i=0; i<waypoints.length; i++) {
 			double x= waypoints[i][0]*SQRTLENGTH;
