@@ -33,9 +33,11 @@ public class Navigator {
 		this.odometer = odometer;
 	}
 	
+	
+	//TODO IF NAVIGATION IS BROKEN CHECK HERE
 	// Convert how far they need to travel
 	private static int convertDistance(double radius, double distance) {
-		return (int) ((180.0 * distance) / (Math.PI * radius));
+		return (int)((distance) / (2*Math.PI * radius));
 	}
 
 
@@ -121,13 +123,13 @@ public class Navigator {
 	//Allows robot to drive set # of cm
 	public void driveDistance(double distance, boolean forward) {
 		if (forward) {
-			leftMotor.rotate(convertDistance(RADIUS, distance), true);
-			rightMotor.rotate(convertDistance(RADIUS, distance), false);
+			System.out.println(convertDistance(RADIUS, distance));
+			leftMotor.rotate((int) (360*convertDistance(RADIUS, distance)), true);
+			rightMotor.rotate((int) (360*convertDistance(RADIUS, distance)), false);
 		} else {
 			leftMotor.rotate(-convertDistance(RADIUS, distance), true);
 			rightMotor.rotate(-convertDistance(RADIUS, distance), false);
 		}
-
 	}
 	
 	public void synchronizeMotors() {
@@ -167,14 +169,20 @@ public class Navigator {
 	}
 	
 	
+	public void driveZiplineDistance(double distance) {
+		zipMotor.rotate(convertDistance(RADIUS, distance), false);
+	}
+	
+	
 	public void driveZipline() {
-		synchronizeMotors();
-		startSynchronization();
-//		zipMotor.setSpeed(FORWARD_SPEED);
-//		zipMotor.forward();
-		driveDistance(10000, true);
-		endSynchronization();
-		zipMotor.stop();
+		leftMotor.setAcceleration(60);
+		rightMotor.setAcceleration(60);
+		zipMotor.setSpeed(350);
+		zipMotor.backward();
+
+		driveDistance(30.48 * 9, true);
+		Sound.beep();
+		
 		Sound.beep();
 		
 	}

@@ -22,7 +22,7 @@ public class ZiplineLab {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	public static final EV3LargeRegulatedMotor zipMotor = 
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-	private static final Port usPort = LocalEV3.get().getPort("S1");
+	// private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort=LocalEV3.get().getPort("S4");
 
 
@@ -46,13 +46,13 @@ public class ZiplineLab {
 		//created for the distance measured
 		@SuppressWarnings("resource") // Because we don't bother to close this resource
 		SensorModes colorSensor= new EV3ColorSensor(colorPort);
-		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
-		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
+		//SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
+		//SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
 		SampleProvider colorValue=colorSensor.getMode("Red");
-		float[] usData = new float[usDistance.sampleSize()];
+		//float[] usData = new float[usDistance.sampleSize()];
 		float[] lightValue=new float[colorValue.sampleSize()];
-		UltrasonicLocalizer usLocalizer=new UltrasonicLocalizer(leftMotor, rightMotor, 
-				odometer, usDistance, usData);
+		//UltrasonicLocalizer usLocalizer=new UltrasonicLocalizer(leftMotor, rightMotor, 
+		//		odometer, usDistance, usData);
 
 //		// initiate integer to store coordinates
 //		int xo=0;
@@ -188,12 +188,9 @@ public class ZiplineLab {
 //		Button.waitForAnyPress();
 //
 //		usLocalizer.doLocalization();
-		zipMotor.setSpeed(250);
-		zipMotor.backward();
+		System.out.println("Press enter big boi");
 		while(Button.waitForAnyPress() != Button.ID_ENTER);
 	    navigator.driveZipline();
-		zipMotor.setSpeed(250);
-		zipMotor.backward();
 	    
 	    while(navigator.isNavigating() || Button.waitForAnyPress() != Button.ID_ESCAPE) {
 	    	
