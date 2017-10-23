@@ -20,9 +20,11 @@ public class ZiplineLab {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	public static final EV3LargeRegulatedMotor zipMotor = 
+			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort=LocalEV3.get().getPort("S4");
-	private static boolean isFallingEdge;
+
 
 
 	/**
@@ -37,7 +39,7 @@ public class ZiplineLab {
 		final TextLCD t=LocalEV3.get().getTextLCD();
 		Odometer odometer = new Odometer(leftMotor,rightMotor);
 		OdometryDisplay odometryDisplay =new OdometryDisplay(odometer,t);
-		Navigator navigator = new Navigator(leftMotor, rightMotor, odometer);
+		Navigator navigator = new Navigator(leftMotor, rightMotor, zipMotor, odometer);
 		LightLocalization lightLocalizer;
 
 
@@ -52,143 +54,152 @@ public class ZiplineLab {
 		UltrasonicLocalizer usLocalizer=new UltrasonicLocalizer(leftMotor, rightMotor, 
 				odometer, usDistance, usData);
 
-		// initiate integer to store coordinates
-		int xo=0;
-		int yo=0;
-		int xc=0;
-		int yc=0;
+//		// initiate integer to store coordinates
+//		int xo=0;
+//		int yo=0;
+//		int xc=0;
+//		int yc=0;
+//
+//		t.clear();
+//		t.drawString("  Enter         ", 0, 0);
+//		t.drawString("  X0, Y0           ", 0, 1);	
+//		t.drawString("  PRESS ANYBUTTON  ", 0, 2);
+//		t.drawString("  TO START           ", 0, 3);
+//		Button.waitForAnyPress();
+//
+//		t.clear();
+//		t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//		t.drawString(" LEFT X-1", 0, 1);
+//		t.drawString(" RIGHT X+1",0, 2);
+//		t.drawString(" UP Y+1", 0, 3);
+//		t.drawString(" DOWN Y-1 ", 0,4 );
+//		t.drawString(" CONFIRM PRESS ENTER ", 0, 5);
+//
+//		buttonChoice= Button.waitForAnyPress();
+//		t.clear();
+//		while (buttonChoice!=Button.ID_ENTER) {
+//			if(buttonChoice==Button.ID_LEFT) {
+//				xo--;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_RIGHT) {
+//				xo++;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_UP) {
+//				yo++;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_DOWN) {
+//				yo--;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//
+//			buttonChoice=Button.waitForAnyPress();
+//		}
+//		t.clear();
+//		t.drawString(" X0="+xo +"Yo="+yo   , 0, 0);
+//
+//		t.drawString("   CONFIRMED   ", 0, 3);
+//		
+//		Button.waitForAnyPress();
+//				
+//		t.clear();
+//		t.drawString(" Enter         ", 0, 0);
+//		t.drawString(" XC,YC           ", 0, 1);
+//		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
+//		t.drawString(" TO START         ", 0, 4);
+//		Button.waitForAnyPress();
+//		
+//		t.clear();
+//		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//		t.drawString(" LEFT X-1", 0, 1);
+//		t.drawString(" RIGHT X+1",0, 2);
+//		t.drawString(" UP Y+1", 0, 3);
+//		t.drawString(" DOWN Y-1 ", 0,4 );
+//		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//		buttonChoice=Button.waitForAnyPress();
+//
+//
+//		while (buttonChoice!=Button.ID_ENTER) {
+//			if(buttonChoice==Button.ID_LEFT) {
+//				xc--;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_RIGHT) {
+//				xc++;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_UP) {
+//				yc++;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_DOWN) {
+//				yc--;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//
+//			buttonChoice=Button.waitForAnyPress();
+//		}
+//		t.clear();
+//		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
+//		t.drawString(" CONFIRMED   ", 0, 3);
+//		odometer.run();
+//		Button.waitForAnyPress();
+//
+//		usLocalizer.doLocalization();
+		zipMotor.setSpeed(250);
+		zipMotor.backward();
+		while(Button.waitForAnyPress() != Button.ID_ENTER);
+	    navigator.driveZipline();
+		zipMotor.setSpeed(250);
+		zipMotor.backward();
+	    
+	    while(navigator.isNavigating() || Button.waitForAnyPress() != Button.ID_ESCAPE) {
+	    	
+	    }
 
-		t.clear();
-		t.drawString("  Enter         ", 0, 0);
-		t.drawString("  X0, Y0           ", 0, 1);	
-		t.drawString("  PRESS ANYBUTTON  ", 0, 2);
-		t.drawString("  TO START           ", 0, 3);
-		Button.waitForAnyPress();
-
-		t.clear();
-		t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-		t.drawString(" LEFT X-1", 0, 1);
-		t.drawString(" RIGHT X+1",0, 2);
-		t.drawString(" UP Y+1", 0, 3);
-		t.drawString(" DOWN Y-1 ", 0,4 );
-		t.drawString(" CONFIRM PRESS ENTER ", 0, 5);
-
-		buttonChoice= Button.waitForAnyPress();
-		t.clear();
-		while (buttonChoice!=Button.ID_ENTER) {
-			if(buttonChoice==Button.ID_LEFT) {
-				xo--;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_RIGHT) {
-				xo++;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_UP) {
-				yo++;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_DOWN) {
-				yo--;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-
-			buttonChoice=Button.waitForAnyPress();
-		}
-		t.clear();
-		t.drawString(" X0="+xo +"Yo="+yo   , 0, 0);
-
-		t.drawString("   CONFIRMED   ", 0, 3);
-		
-		Button.waitForAnyPress();
-				
-		t.clear();
-		t.drawString(" Enter         ", 0, 0);
-		t.drawString(" XC,YC           ", 0, 1);
-		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
-		t.drawString(" TO START         ", 0, 4);
-		Button.waitForAnyPress();
-		
-		t.clear();
-		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-		t.drawString(" LEFT X-1", 0, 1);
-		t.drawString(" RIGHT X+1",0, 2);
-		t.drawString(" UP Y+1", 0, 3);
-		t.drawString(" DOWN Y-1 ", 0,4 );
-		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-		buttonChoice=Button.waitForAnyPress();
-
-
-		while (buttonChoice!=Button.ID_ENTER) {
-			if(buttonChoice==Button.ID_LEFT) {
-				xc--;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_RIGHT) {
-				xc++;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_UP) {
-				yc++;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_DOWN) {
-				yc--;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-
-			buttonChoice=Button.waitForAnyPress();
-		}
-		t.clear();
-		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
-		t.drawString(" CONFIRMED   ", 0, 3);
-		odometer.run();
-		Button.waitForAnyPress();
-
-		usLocalizer.doLocalization();
-
-		System.exit(0);
-
+	    System.exit(0);
 	}
 
 

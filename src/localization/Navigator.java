@@ -1,6 +1,9 @@
 package localization;
 
 
+import ca.mcgill.ecse211.Lab5.ZiplineLab;
+import lejos.hardware.Sound;
+import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 import localization.Odometer;
@@ -10,7 +13,7 @@ public class Navigator {
 	
 	// vehicle variables
 	private static Odometer odometer;
-	private static EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private static EV3LargeRegulatedMotor leftMotor, rightMotor, zipMotor;
 	private static final double RADIUS = 2.2;
 	private static final double TRACK = 9.88;
 	private final int MOTOR_ACCELERATION = 200;
@@ -22,9 +25,11 @@ public class Navigator {
 	/* TODO
 	 * If there is any changes to TRACK or RADIUS make sure to change odometer  
 	 */
-	public Navigator(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, Odometer odometer) {
+	public Navigator(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, 
+					EV3LargeRegulatedMotor zipMotor, Odometer odometer) {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
+		this.zipMotor = zipMotor;
 		this.odometer = odometer;
 	}
 	
@@ -114,7 +119,7 @@ public class Navigator {
 	}
 	
 	//Allows robot to drive set # of cm
-	public void driveDistance(int distance, boolean forward) {
+	public void driveDistance(double distance, boolean forward) {
 		if (forward) {
 			leftMotor.rotate(convertDistance(RADIUS, distance), true);
 			rightMotor.rotate(convertDistance(RADIUS, distance), false);
@@ -159,5 +164,18 @@ public class Navigator {
 	// Checks whether robot is navigating
 	public boolean isNavigating() {
 		return (leftMotor.isMoving() && rightMotor.isMoving());
+	}
+	
+	
+	public void driveZipline() {
+		synchronizeMotors();
+		startSynchronization();
+//		zipMotor.setSpeed(FORWARD_SPEED);
+//		zipMotor.forward();
+		driveDistance(10000, true);
+		endSynchronization();
+		zipMotor.stop();
+		Sound.beep();
+		
 	}
 }
