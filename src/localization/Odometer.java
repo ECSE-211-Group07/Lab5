@@ -17,7 +17,7 @@ public class Odometer extends Thread {
 
 	private static final long ODOMETER_PERIOD = 25; /*odometer update period, in ms*/
 
-	private Object lock; /*lock object for mutual exclusion*/
+	public Object lock; /*lock object for mutual exclusion*/
 
 	// default constructor
 	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor) {
@@ -30,6 +30,15 @@ public class Odometer extends Thread {
 		this.rightMotorTachoCount = 0;
 
 		lock = new Object();
+	}
+	public double adjustTheta(double angle) {
+		double twoPi = 2 * Math.PI;
+		if (angle <= twoPi && angle >= 0) return angle;
+		else if (angle > twoPi) {
+			return angle - twoPi;
+		} else {
+			return angle + twoPi;
+		}
 	}
 
 	// run method (required for Thread)

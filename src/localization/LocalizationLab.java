@@ -1,6 +1,7 @@
 package localization;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -30,6 +31,8 @@ public class LocalizationLab {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static boolean isFallingEdge;
+	private static final double WHEEL_RADIUS = 2.1;
+	private static final double WHEEL_BASE = 9.88;
 
 	/**
 	 * TODO
@@ -45,16 +48,14 @@ public class LocalizationLab {
 		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
 		UltrasonicLocalizer usLocalizer;
 		LightLocalization lightLocalizer;
+		Navigation navigator = new Navigation(odometer, leftMotor, rightMotor, WHEEL_BASE, WHEEL_RADIUS);
 
 
-		//created for the distance measured
-		//@SuppressWarnings("resource") // Because we don't bother to close this resource
+		@SuppressWarnings("resource") 
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
 		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
-		// this instance
 		float[] usData = new float[usDistance.sampleSize()];
-		// usData is the buffer in which data are
-		// returned  
+ 
 		do {
 			t.clear();
 
@@ -89,22 +90,38 @@ public class LocalizationLab {
 		} while(buttonChoice!=Button.ID_LEFT && buttonChoice!=Button.ID_RIGHT);
 
 		if(buttonChoice == Button.ID_LEFT) {
+			usLocalizer = new UltrasonicLocalizer(odometer, navigator, leftMotor, rightMotor, "falling");
+			UltrasonicPoller usPoller = new UltrasonicPoller(usDistance, usData, usLocalizer);
 			odometer.start();
 			odometrydisplay.start();
-			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
-			usLocalizer.doLocalization();
+			navigator.start();
+			usLocalizer.start();
+			usPoller.start();
 		}
 
 		else {
+			usLocalizer = new UltrasonicLocalizer(odometer, navigator, leftMotor, rightMotor, "falling");
+			UltrasonicPoller usPoller = new UltrasonicPoller(usDistance, usData, usLocalizer);
 			odometer.start();
 			odometrydisplay.start();
-			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
-			usLocalizer.doLocalization();
+			navigator.start();
+			usLocalizer.start();
+			usPoller.start();
+			
 
 			buttonChoice=Button.waitForAnyPress();
 			if(buttonChoice==Button.ID_ENTER) {
-				lightLocalizer = new LightLocalization (odometer,leftMotor,rightMotor);
-				lightLocalizer.doLocalization();
+				lightLocalizer = new LightLocalization(navigator, odometer);
+				lightLocalizer.start();
+				odometer.setTheta(0);
+				//start rotating 360 degrees, obtaining data from color sensor
+				System.out.println("Starting light localization rotation: " + odometer.getTheta());
+				navigator.turnTo(360);
+				System.out.println("Finishing light localization rotation: " + odometer.getTheta());
+				
+				odometer.setTheta(0);
+				navigator.travelTo(0, 0);
+				navigator.turnTo(-45);
 			}
 		}
 
