@@ -11,7 +11,7 @@ public class Navigator {
 	
 	// vehicle variables
 	private static Odometer odometer;
-	private static EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private static EV3LargeRegulatedMotor leftMotor, rightMotor, zipMotor;
 	private static final double RADIUS = 2.1;
 	private static final double TRACK = 9.75;
 	private final int MOTOR_ACCELERATION = 50;
@@ -23,7 +23,8 @@ public class Navigator {
 	/* TODO
 	 * If there is any changes to TRACK or RADIUS make sure to change odometer  
 	 */
-	public Navigator(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, Odometer odometer) {
+	public Navigator(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, 
+			EV3LargeRegulatedMotor zipMotor, Odometer odometer) {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
 		this.odometer = odometer;
@@ -159,6 +160,26 @@ public class Navigator {
 		} else {
 			rightMotor.backward();
 		}
+	}
+	
+	public void driveZiplineDistance(double distance) {
+		zipMotor.rotate(convertDistance(RADIUS, distance), false);
+	}
+	
+	public void driveLength(double distance) {
+		leftMotor.rotate((int) (360*convertDistance(RADIUS, distance)), true);
+		rightMotor.rotate((int) (360*convertDistance(RADIUS, distance)), false);
+	}
+	
+	public void driveZipline() {
+		leftMotor.setAcceleration(60);
+		rightMotor.setAcceleration(60);
+		zipMotor.setSpeed(350);
+		zipMotor.backward();
+
+		driveLength(30.48 * 9);
+
+		
 	}
 	
 	// Checks whether robot is navigating
