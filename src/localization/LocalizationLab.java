@@ -26,6 +26,8 @@ public class LocalizationLab {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor zipMotor =
+			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
 	private static boolean isFallingEdge;
@@ -47,7 +49,7 @@ public class LocalizationLab {
 		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
 		UltrasonicLocalizer usLocalizer;
 		LightLocalization lightLocalizer;
-		Navigator navigation = new Navigator(leftMotor, rightMotor, odometer);
+		Navigator navigation = new Navigator(leftMotor, rightMotor, zipMotor, odometer);
 
 
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
@@ -207,11 +209,14 @@ public class LocalizationLab {
 			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
 			lightLocalizer.doLocalization(1, 1);
 			navigation.turnTo(-10, false);
-			navigation.travelTo(1, 2);
-			lightLocalizer.doLocalization(1, 2);
+			navigation.travelTo(xo, yo);
+			navigation.turnTo(90, false);
+			lightLocalizer.doLocalization(xo, yo);
 			//navigation.travelTo(7, 2);
 			//navigation.travelTo(6, 2);
 		}
+		
+		navigation.driveZipline();
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
 		System.exit(0);
