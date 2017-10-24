@@ -1,104 +1,77 @@
 package localization;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+
 public class Odometer extends Thread {
-
+	//ALL DISTANCE VALUES ARE IN CM,THETA IN RAD-> CONVERT TO DEGREES
 	// robot position
-	private double x;
-	private double y;
-	private double theta;
-	private int leftMotorTachoCount;
-	private int rightMotorTachoCount;
-	private EV3LargeRegulatedMotor leftMotor;
-	private EV3LargeRegulatedMotor rightMotor;
-	public static final double WHEEL_RADIUS = 2.2;
-	public static final double TRACK = 9.88;
+	private double x, y, theta, track;
+	private int currentLeftMotorTachoCount, currentRightMotorTachoCount,
+				prevLeftMotorTachoCount, prevRightMotorTachoCount;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	// odometer update period, in ms
+	private static final long ODOMETER_PERIOD = 25;
+	
+	// circumference of our wheel given a radius of 2.1cm
+	private static final double WHEEL_CIRCUM = Math.PI*4.2;
 
-
-	private static final long ODOMETER_PERIOD = 25; /*odometer update period, in ms*/
-
-	public Object lock; /*lock object for mutual exclusion*/
+	// lock object for mutual exclusion
+	public Object lock;
 
 	// default constructor
-	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor) {
+	public Odometer(EV3LargeRegulatedMotor leftMotor,EV3LargeRegulatedMotor rightMotor, double track) {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
+		this.track = track;
 		this.x = 0.0;
 		this.y = 0.0;
 		this.theta = 0.0;
-		this.leftMotorTachoCount = 0;
-		this.rightMotorTachoCount = 0;
-
+		this.currentLeftMotorTachoCount = 0;
+		this.currentRightMotorTachoCount = 0;
+		this.prevLeftMotorTachoCount = 0;
+		this.prevRightMotorTachoCount = 0;
 		lock = new Object();
-	}
-	public double adjustTheta(double angle) {
-		double twoPi = 2 * Math.PI;
-		if (angle <= twoPi && angle >= 0) return angle;
-		else if (angle > twoPi) {
-			return angle - twoPi;
-		} else {
-			return angle + twoPi;
-		}
 	}
 
 	// run method (required for Thread)
 	public void run() {
 		long updateStart, updateEnd;
 
-		//initialization
-		int lastLeftTachoCount=0;
-		int lastRightTachoCount=0;
-
-		double distL, distR, deltaD, deltaT, dX, dY;
-
 		while (true) {
 			updateStart = System.currentTimeMillis();
-
-			// TODO put (some of) your odometer code here
-
-			//get present tachocount
-			int currentLeftTachoCount=leftMotor.getTachoCount();
-			int currentRightTachoCount=rightMotor.getTachoCount();
-
-
-			//calculate arclength traveled by two wheels
-			distL=Math.PI*(WHEEL_RADIUS)*(currentLeftTachoCount-lastLeftTachoCount)/180;
-			distR=Math.PI*(WHEEL_RADIUS)*(currentRightTachoCount-lastRightTachoCount)/180;
-
-			//set last tachocount to be current cachocount
-			lastLeftTachoCount=currentLeftTachoCount;
-			lastRightTachoCount=currentRightTachoCount;
-
-			//calculate displacement and change in theta
-			deltaD=(distL+distR)/2;
-			deltaT=((distL-distR)/(TRACK))*180/(Math.PI);
-
-
-
-			//normalization , make sure theta is between 0 and 360 degrees
-			if (theta >= 360) {
-				theta = theta - 360;
-			}
-			else if( theta < 0) {
-				theta = theta +360;
-			}
+			
+			// Get current tachometer values
+			currentLeftMotorTachoCount = leftMotor.getTachoCount();
+			currentRightMotorTachoCount = rightMotor.getTachoCount();
+			
+			// Compare it with the previous value to get the change
+			int leftDeltaTacho = currentLeftMotorTachoCount - prevLeftMotorTachoCount;
+			int rightDeltaTacho = currentRightMotorTachoCount - prevRightMotorTachoCount;
+			
+			// Use our change in rotation values to calculate displacement of each wheel
+			double leftMotorDisplacement = WHEEL_CIRCUM*leftDeltaTacho/360;
+			double rightMotorDisplacement = WHEEL_CIRCUM*rightDeltaTacho/360;
+			
+			// angle at which our vehicle changed
+			double thetaChange = ( leftMotorDisplacement - rightMotorDisplacement )/track;
+			// change in distance of our vehicle
+			double displacement = ( leftMotorDisplacement + rightMotorDisplacement )/2;
+			
+			prevLeftMotorTachoCount = currentLeftMotorTachoCount;
+			prevRightMotorTachoCount = currentRightMotorTachoCount;
+			
 
 			synchronized (lock) {
 				/**
-				 * Don't use the variables x, y, or theta anywhere but here! Only update the values of x, y,
-				 * and theta in this block. Do not perform complex math
+				 * Don't use the variables x, y, or theta anywhere but here!
+				 * Only update the values of x, y, and theta in this block. 
+				 * Do not perform complex math
 				 * 
 				 */
-
-				//calculate displacement in x and y direction
-				dX=deltaD*Math.sin(theta*Math.PI/180);
-				dY=deltaD*Math.cos(theta*Math.PI/180);
-
-				//update the x, y and theta reading
-				x=x+dX;
-				y=y+dY;
-
-				theta=theta+deltaT; // TODO replace example value
+				theta += thetaChange;
+				x += displacement*Math.sin(theta);
+				y += displacement*Math.cos(theta);
+				
 			}
 
 			// this ensures that the odometer only runs once every period
@@ -115,6 +88,7 @@ public class Odometer extends Thread {
 		}
 	}
 
+	// accessors
 	public void getPosition(double[] position, boolean[] update) {
 		// ensure that the values don't change while the odometer is running
 		synchronized (lock) {
@@ -123,7 +97,11 @@ public class Odometer extends Thread {
 			if (update[1])
 				position[1] = y;
 			if (update[2])
-				position[2] = theta;
+				if(theta>=0) {
+	  				position[2] = ( theta * 360 / ( 2 * Math.PI ) ) % 360;
+	 			} else {
+	 			    position[2] = (( theta * 360 / ( 2 * Math.PI ) ) % 360)+360;
+	 			}
 		}
 	}
 
@@ -133,6 +111,7 @@ public class Odometer extends Thread {
 		synchronized (lock) {
 			result = x;
 		}
+
 		return result;
 	}
 
@@ -155,12 +134,23 @@ public class Odometer extends Thread {
 
 		return result;
 	}
+	
+	public double getThetaDegrees() {
+		double result;
 
+		synchronized (lock) {
+			if(theta>=0) {
+				result = Math.toDegrees(theta) % 360;
+ 			} else {
+ 				result = Math.toDegrees(theta)+360;
+ 			}
+		}
 
+		return result;
+	}
 
 	// mutators
 	public void setPosition(double[] position, boolean[] update) {
-
 		// ensure that the values don't change while the odometer is running
 		synchronized (lock) {
 			if (update[0])
@@ -168,7 +158,7 @@ public class Odometer extends Thread {
 			if (update[1])
 				y = position[1];
 			if (update[2])
-				theta = position[2];
+				theta = Math.toRadians(position[2]);
 		}
 	}
 
@@ -191,34 +181,34 @@ public class Odometer extends Thread {
 	}
 
 	/**
-	 * @return the leftMotorTachoCount
+	 * @return the currentLeftMotorTachoCount
 	 */
-	public int getLeftMotorTachoCount() {
-		return leftMotorTachoCount;
+	public int getCurrentLeftMotorTachoCount() {
+		return currentLeftMotorTachoCount;
 	}
 
 	/**
-	 * @param leftMotorTachoCount the leftMotorTachoCount to set
+	 * @param currentLeftMotorTachoCount the currentLeftMotorTachoCount to set
 	 */
-	public void setLeftMotorTachoCount(int leftMotorTachoCount) {
+	public void setCurrentLeftMotorTachoCount(int currentLeftMotorTachoCount) {
 		synchronized (lock) {
-			this.leftMotorTachoCount = leftMotorTachoCount;
+			this.currentLeftMotorTachoCount = currentLeftMotorTachoCount;	
 		}
 	}
 
 	/**
-	 * @return the rightMotorTachoCount
+	 * @return the currentRightMotorTachoCount
 	 */
-	public int getRightMotorTachoCount() {
-		return rightMotorTachoCount;
+	public int getCurrentRightMotorTachoCount() {
+		return currentRightMotorTachoCount;
 	}
 
 	/**
-	 * @param rightMotorTachoCount the rightMotorTachoCount to set
+	 * @param currentRightMotorTachoCount the currentRightMotorTachoCount to set
 	 */
-	public void setRightMotorTachoCount(int rightMotorTachoCount) {
+	public void setCurrentRightMotorTachoCount(int currentRightMotorTachoCount) {
 		synchronized (lock) {
-			this.rightMotorTachoCount = rightMotorTachoCount;
+			this.currentRightMotorTachoCount = currentRightMotorTachoCount;	
 		}
 	}
 }

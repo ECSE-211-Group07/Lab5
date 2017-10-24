@@ -18,7 +18,7 @@ public class UltrasonicLocalizer extends Thread implements UltrasonicController 
 	final TextLCD t = LocalEV3.get().getTextLCD();
 
 	private Odometer odometer;
-	private Navigation navigator;
+	private Navigator navigator;
 	
 	//filter variables
 	private static final int FILTER_OUT = 20;
@@ -30,7 +30,7 @@ public class UltrasonicLocalizer extends Thread implements UltrasonicController 
 
 	EV3LargeRegulatedMotor leftMotor, rightMotor;
 
-	public UltrasonicLocalizer(Odometer odometer, Navigation navigator, EV3LargeRegulatedMotor leftMotor,
+	public UltrasonicLocalizer(Odometer odometer, Navigator navigator, EV3LargeRegulatedMotor leftMotor,
 			EV3LargeRegulatedMotor rightMotor, String mode) {
 		this.odometer = odometer;
 		this.navigator = navigator;
@@ -45,16 +45,12 @@ public class UltrasonicLocalizer extends Thread implements UltrasonicController 
 		switch (this.mode) {
 			case "falling":
 				//odometer.setTheta(0);		//ensure theta is initially 0 for odometer
-				System.out.println("Starting first rotation " + Math.toDegrees(odometer.getTheta()));
-				navigator.turnTo(360);		//do full 360 rotation, gathering data from US sensor
-				System.out.println("Finished first rotation " + Math.toDegrees(odometer.getTheta()));
+				navigator.turnTo(360, false);		//do full 360 rotation, gathering data from US sensor
 				double firstFallingEdge = calculateFallingEdge();	
-				System.out.println("Starting second rotation " + Math.toDegrees(odometer.getTheta()));
-				navigator.turnTo(-360);		//do full 360 rotation, gathering data from US sensor
-				System.out.println("Finished second rotation " + Math.toDegrees(odometer.getTheta()));    //do full 360 rotation in other direction to calculate other fallingEdge
+				navigator.turnTo(-360, false);		//do full 360 rotation, gathering data from US sensor
 				double secondFallingEdge = calculateFallingEdge();
 				double fallingCorner = (firstFallingEdge + secondFallingEdge) / 2;	//angle of corner between two walls
-				navigator.turnTo(fallingCorner + 135);	// rotate to the corner, and then an additional 135 degrees to get to 0 degrees
+				navigator.turnTo(fallingCorner + 135, false);	// rotate to the corner, and then an additional 135 degrees to get to 0 degrees
 				odometer.setTheta(0);
 				t.drawString("first: " + firstFallingEdge, 0, 4);
 				t.drawString("second: " + secondFallingEdge, 0, 5);
@@ -62,12 +58,12 @@ public class UltrasonicLocalizer extends Thread implements UltrasonicController 
 				break;
 			case "rising":
 				odometer.setTheta(0);
-				navigator.turnTo(360);
+				navigator.turnTo(360, false);
 				double firstRisingEdge = calculateRisingEdge();
-				navigator.turnTo(-360);
+				navigator.turnTo(-360, false);
 				double secondRisingEdge = calculateRisingEdge();
 				double risingCorner = (firstRisingEdge + secondRisingEdge) / 2;
-				navigator.turnTo(risingCorner - 45);
+				navigator.turnTo(risingCorner - 45, false);
 				odometer.setTheta(0);
 				t.drawString("first: " + firstRisingEdge, 0, 4);
 				t.drawString("second: " + secondRisingEdge, 0, 5);
@@ -127,13 +123,13 @@ public class UltrasonicLocalizer extends Thread implements UltrasonicController 
 			// there: leave the distance alone
 			this.distance = distance;
 			this.distances.add(distance);
-			this.thetas.add(this.odometer.getTheta());
+			this.thetas.add(this.odometer.getThetaDegrees());
 		} else {
 			// distance went below 255: reset filter and leave
 			// distance alone.
 			this.distance = distance;
 			this.distances.add(distance);
-			this.thetas.add(this.odometer.getTheta());
+			this.thetas.add(this.odometer.getThetaDegrees());
 		}
 		
 		

@@ -1,79 +1,111 @@
 package localization;
 
 import lejos.hardware.Sound;
-import lejos.hardware.port.SensorPort;
+import lejos.ev3.tools.EV3Console;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.robotics.SampleProvider;
+import localization.Navigator;
+import localization.Odometer;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.robotics.Color;
+import lejos.robotics.SampleProvider;
 
-public class LightLocalization extends Thread {
-	private double sensorReading;
-	private int direction;
-	private int sampleSize = 100;
-	private float sample, prevSample = 0;
-	private EV3ColorSensor sensor;
-	
-	//count how many black lines we have encountered
-	private int counter = 0;
-	//distance from front of robot to sensor
-	private double d = 19;
-	
-	public static double x, y;
-	
-	private Navigation navigator;
+public class LightLocalization {
 	private Odometer odometer;
+	private Navigator navigation;
+	double [] lightData;
 	
-	//array to hold samples obtained from light sensor
-	private float[] samples = new float[sampleSize];
-	
-	public LightLocalization(Navigation navigator, Odometer odometer) {
-		this.navigator = navigator;
+	private SampleProvider colorSensor;
+	private float[] colorData;
+
+	public LightLocalization(Odometer odometer, SampleProvider colorSensor,
+						  float[] colorData, Navigator navigator) {
 		this.odometer = odometer;
-		sensor = new EV3ColorSensor(SensorPort.S4);
+		this.navigation = navigator;
+		this.lightData = new double [5];
+		this.colorSensor = colorSensor;
+		this.colorData = colorData;
+	}
+
+	public void doLocalization() {
+
+
+		// Will rotate the robot and collect lines
+		rotateLightSensor();
+		
+		// correct position of our robot using light sensor data
+		correctPosition();
+		
+		// travel to 0,0 then turn to the 0 angle
+		navigation.travelTo(0, 0);
+		
+		// Corrects theta value
+		correctAngle();
+		
+		navigation.setSpeed(0,0);
 	}
 	
-
-	public void run() {
-		boolean isBlack = false;
-		while (true) {
-			double thetaOneX = 0, thetaTwoX = 0, thetaOneY = 0, thetaTwoY = 0, deltaX, deltaY;
-			sensor.getRedMode().fetchSample(samples, 0);
-			sample = samples[0]; //get most recent sample
-			if (prevSample - sample >= 0.1) {
-				isBlack = true;
-			} else {
-				isBlack = false;
-			}
-			prevSample = sample;
-			//black lines are any value less than 0.2
-			if (isBlack) {
-				Sound.beep();
-				
-				//increment counter
-				counter++;
-				//obtain theta values at each line crossing
-				if (counter == 1) {
-					thetaOneX = odometer.getTheta();
-				} else if (counter == 2) {
-					thetaOneY = odometer.getTheta();
-				}
-				else if (counter == 3) {
-					thetaTwoX = odometer.getTheta();
-					deltaX = thetaTwoX - thetaOneX;
-					//use formula provided
-					this.y = -d * Math.cos(deltaX / 2);
-					//set y so we can use the travelTo method
-					odometer.setY(-this.y + 5);
-				} else if (counter == 4) {
-					thetaTwoY = odometer.getTheta();
-					deltaY = thetaTwoY - thetaOneY;
-					// use formula provided
-					this.x = -d * Math.cos(deltaY / 2);
-					System.out.println("fourth line encountered");
-					//set x so we can use travelTo method
-					odometer.setX(-this.x + 5);
-				}
-			}
+	/*
+	 * Corrects angle of theta and stops the robot if it runs over 
+	 * another set of lines
+	 */
+	public void correctAngle() {
+		navigation.turnTo(-odometer.getThetaDegrees()%360, true);
+		
+		colorSensor.fetchSample(colorData, 0);
+		while (navigation.isNavigating()) {
+//			if(colorData[0] < 0.35 && (odometer.getThetaDegrees() < 20 || odometer.getThetaDegrees() > 340)) {
+//				navigation.synchronizeStop();
+//				break;
+//			}
+			colorSensor.fetchSample(colorData, 0);
 		}
 		
 	}
 	
+	/* 
+	* These next two calls will drive our robot to a 
+	* region which will allow it rotate and scan the lines
+	*/ 
+	private void goToApproxOrigin() {
+		navigation.turnTo(45, false);
+
+		navigation.driveDistance(15, true);
+	}
+	
+	/* Rotates sensor around the origin and saves the theta 
+	 * which the point was encoutered at
+	 */
+	private void rotateLightSensor() {
+		int lineIndex=1;
+		while(navigation.isNavigating()) {
+			colorSensor.fetchSample(colorData, 0);
+			if(colorData[0] < 0.35 && lineIndex < 5) {
+				lightData[lineIndex]=odometer.getThetaDegrees();
+				lineIndex++;
+				Sound.beep();
+			}
+		}
+	}
+	
+	
+	/**
+	 * Uses mathematical calculations to compute the correct robot position
+	 */
+	private void correctPosition() {
+		//compute difference in angles
+		double deltaThetaY= Math.abs(lightData[1]-lightData[3]);
+		double deltaThetaX= Math.abs(lightData[2]-lightData[4]);
+		
+		double deltaTheta = 270 + (deltaThetaY)/2 - (lightData[1]);
+		
+		//use trig to determine position of the robot 
+		double Xnew = SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaX)) + odometer.getX();
+		double Ynew = SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaY)) + odometer.getY();
+		
+		odometer.setPosition(new double [] {Xnew, Ynew, Tnew}, 
+					new boolean [] {true, true, true});
+
+	}
 }

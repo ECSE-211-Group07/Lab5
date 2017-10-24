@@ -11,8 +11,8 @@ public class Navigator {
 	// vehicle variables
 	private static Odometer odometer;
 	private static EV3LargeRegulatedMotor leftMotor, rightMotor;
-	private static final double RADIUS = 2.2;
-	private static final double TRACK = 9.88;
+	private static final double RADIUS = 2.1;
+	private static final double TRACK = 10.8;
 	private final int MOTOR_ACCELERATION = 200;
 	
 	// navigation variables

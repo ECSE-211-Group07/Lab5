@@ -49,7 +49,7 @@ public class ZiplineLab {
 		SampleProvider colorValue=colorSensor.getMode("Red");
 		float[] usData = new float[usDistance.sampleSize()];
 		float[] lightValue=new float[colorValue.sampleSize()];
-		UltrasonicLocalizer usLocalizer=new UltrasonicLocalizer(leftMotor, rightMotor, 
+		UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, 
 				odometer, usSensor, usData);
 
 		// initiate integer to store coordinates
