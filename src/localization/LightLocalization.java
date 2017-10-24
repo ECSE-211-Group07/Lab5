@@ -14,6 +14,7 @@ import lejos.robotics.SampleProvider;
 public class LightLocalization {
 	private Odometer odometer;
 	private Navigator navigation;
+	private static double SENSOR_DISTANCE = 14;
 	double [] lightData;
 	
 	private SampleProvider colorSensor;
@@ -30,6 +31,7 @@ public class LightLocalization {
 
 	public void doLocalization() {
 
+		// goToApproxOrigin();
 
 		// Will rotate the robot and collect lines
 		rotateLightSensor();
@@ -78,6 +80,7 @@ public class LightLocalization {
 	 * which the point was encoutered at
 	 */
 	private void rotateLightSensor() {
+		navigation.turnTo(-360, true);
 		int lineIndex=1;
 		while(navigation.isNavigating()) {
 			colorSensor.fetchSample(colorData, 0);
@@ -87,6 +90,7 @@ public class LightLocalization {
 				Sound.beep();
 			}
 		}
+		// navigation.setSpeed(0,0);
 	}
 	
 	
@@ -103,6 +107,7 @@ public class LightLocalization {
 		//use trig to determine position of the robot 
 		double Xnew = SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaX)) + odometer.getX();
 		double Ynew = SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaY)) + odometer.getY();
+		double Tnew = -deltaTheta + odometer.getThetaDegrees();
 		
 		odometer.setPosition(new double [] {Xnew, Ynew, Tnew}, 
 					new boolean [] {true, true, true});
