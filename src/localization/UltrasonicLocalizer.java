@@ -55,14 +55,8 @@ public class UltrasonicLocalizer {
 	 */
 	public void doLocalization() {
 		//this is a falling edge 
-		if(LocalizationLab.getFallingEdge()==true) {
-			fallingEdge();
-		}
-		//this is a rising edge
-		else if(LocalizationLab.getFallingEdge()==false) {
-			risingEdge();
-		}
-		}
+		fallingEdge();
+	}
 	
 
 	//collecting data for the distances

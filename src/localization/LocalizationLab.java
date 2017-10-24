@@ -32,8 +32,6 @@ public class LocalizationLab {
 	private static double WHEEL_BASE = 9.75;
 	private static double WHEEL_RADIUS = 2.1;
 	
-	private static SampleProvider colorSensor;
-	private static float[] colorData;
 
 	/**
 	 * TODO
@@ -63,52 +61,152 @@ public class LocalizationLab {
 		
 		// usData is the buffer in which data are
 		// returned  
-		do {
-			t.clear();
 
-			// ask the user whether the motors should drive in a square or float
-			t.drawString("< Left   | Right  ", 0, 0);
-			t.drawString("         |        ", 0, 1);
-			t.drawString(" Falling | Rising ", 0, 2);
-			t.drawString("  Edge   |  Edge  ", 0, 3);
-			t.drawString("         |        ", 0, 4);
-			buttonChoice= Button.waitForAnyPress();
-		} while (buttonChoice!=Button.ID_LEFT && buttonChoice!=Button.ID_RIGHT);
+		// initiate integer to store coordinates
+		int xo=0;
+		int yo=0;
+		int xc=0;
+		int yc=0;
+
+		t.clear();
+		t.drawString("  Enter         ", 0, 0);
+		t.drawString("  X0, Y0           ", 0, 1);	
+		t.drawString("  PRESS ANYBUTTON  ", 0, 2);
+		t.drawString("  TO START           ", 0, 3);
+		Button.waitForAnyPress();
+
+		t.clear();
+		t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+		t.drawString(" LEFT X-1", 0, 1);
+		t.drawString(" RIGHT X+1",0, 2);
+		t.drawString(" UP Y+1", 0, 3);
+		t.drawString(" DOWN Y-1 ", 0,4 );
+		t.drawString(" CONFIRM PRESS ENTER ", 0, 5);
+
+		buttonChoice= Button.waitForAnyPress();
+		t.clear();
+		while (buttonChoice!=Button.ID_ENTER) {
+			if(buttonChoice==Button.ID_LEFT) {
+				xo--;
+				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_RIGHT) {
+				xo++;
+				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_UP) {
+				yo++;
+				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_DOWN) {
+				yo--;
+				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+
+			buttonChoice=Button.waitForAnyPress();
+		}
+		t.clear();
+		t.drawString(" X0="+xo +"Yo="+yo   , 0, 0);
+
+		t.drawString("   CONFIRMED   ", 0, 3);
 		
-		if(buttonChoice==Button.ID_LEFT) {
-			setFallingEdge(true);
+		Button.waitForAnyPress();
+				
+		t.clear();
+		t.drawString(" Enter         ", 0, 0);
+		t.drawString(" XC,YC           ", 0, 1);
+		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
+		t.drawString(" TO START         ", 0, 4);
+		Button.waitForAnyPress();
+		
+		t.clear();
+		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+		t.drawString(" LEFT X-1", 0, 1);
+		t.drawString(" RIGHT X+1",0, 2);
+		t.drawString(" UP Y+1", 0, 3);
+		t.drawString(" DOWN Y-1 ", 0,4 );
+		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+		buttonChoice=Button.waitForAnyPress();
+
+
+		while (buttonChoice!=Button.ID_ENTER) {
+			if(buttonChoice==Button.ID_LEFT) {
+				xc--;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_RIGHT) {
+				xc++;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_UP) {
+				yc++;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_DOWN) {
+				yc--;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+
+			buttonChoice=Button.waitForAnyPress();
 		}
-		else {
-			setFallingEdge(false);
-		}
+		t.clear();
+		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
+		t.drawString(" CONFIRMED   ", 0, 3);
+		setFallingEdge(true);
 
 		do {
-			// clear the display
-			t.clear();
 
-			// ask the user which sensor to use
-			t.drawString("< Left   | Right  ", 0, 0);
-			t.drawString("  Start  | Start  ", 0, 1);
-			t.drawString(" Ultra   | Light  ", 0, 2);
-			t.drawString("Localiz- | Localiz- ", 0, 3);
-			t.drawString(" ation   | ation  ", 0, 4);
-			buttonChoice= Button.waitForAnyPress();
+		} while(buttonChoice!=Button.ID_ENTER);
 
-		} while(buttonChoice!=Button.ID_LEFT && buttonChoice!=Button.ID_RIGHT);
-
-		if(buttonChoice == Button.ID_LEFT) {
-			odometer.start();
-			odometrydisplay.start();
-			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
-			usLocalizer.doLocalization();
-		} else {
+		if(buttonChoice == Button.ID_ENTER) {
 			odometer.start();
 			odometrydisplay.start();
 			t.clear();
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
 			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
-			lightLocalizer.doLocalization(0, 0);
+			lightLocalizer.doLocalization(1, 1);
+			navigation.turnTo(-10, false);
 			navigation.travelTo(1, 2);
 			lightLocalizer.doLocalization(1, 2);
 			//navigation.travelTo(7, 2);

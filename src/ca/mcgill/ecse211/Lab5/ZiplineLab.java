@@ -14,16 +14,17 @@ import localization.*;
 
 public class ZiplineLab {
 
-	private SampleProvider colorSensor;
-	private float[] colorSample;
+
 	//create the ports
 	private static final EV3LargeRegulatedMotor leftMotor = 
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	private static final EV3LargeRegulatedMotor rightMotor =
+			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
-	private static final Port colorPort=LocalEV3.get().getPort("S4");
+	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
 	private static boolean isFallingEdge;
+	private static double WHEEL_BASE = 9.75;
+	private static double WHEEL_RADIUS = 2.1;
 
 	/**
 	 * TODO
@@ -33,24 +34,25 @@ public class ZiplineLab {
 	public static void main(String[] args) {
 		int buttonChoice=0;
 
-		//create the instances
-		final TextLCD t=LocalEV3.get().getTextLCD();
-		Odometer odometer=new Odometer(leftMotor,rightMotor);
-		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
-
-		LightLocalization lightLocalizer;
-
-
-		//created for the distance measured
-		@SuppressWarnings("resource") // Because we don't bother to close this resource
-		SensorModes colorSensor= new EV3ColorSensor(colorPort);
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
 		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
-		SampleProvider colorValue=colorSensor.getMode("Red");
+		// this instance
 		float[] usData = new float[usDistance.sampleSize()];
-		float[] lightValue=new float[colorValue.sampleSize()];
-		UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, 
-				odometer, usSensor, usData);
+		
+		SensorModes colorMode = lightSensor;
+		SampleProvider colorSensor = colorMode.getMode("Red");
+		float[] colorData = new float[colorMode.sampleSize()];
+		
+		//create the instances
+		final TextLCD t=LocalEV3.get().getTextLCD();
+		Odometer odometer=new Odometer(leftMotor,rightMotor, WHEEL_BASE);
+		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
+		Navigator navigation = new Navigator(leftMotor, rightMotor, odometer);
+		UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
+		LightLocalization lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);;
+
+
+		
 
 		// initiate integer to store coordinates
 		int xo=0;
@@ -119,73 +121,73 @@ public class ZiplineLab {
 		t.drawString(" X0="+xo +"Yo="+yo   , 0, 0);
 
 		t.drawString("   CONFIRMED   ", 0, 3);
-		usLocalizer.doLocalization();
 		
-//		Button.waitForAnyPress();
-//				
-//		t.clear();
-//		t.drawString(" Enter         ", 0, 0);
-//		t.drawString(" XC,YC           ", 0, 1);
-//		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
-//		t.drawString(" TO START         ", 0, 4);
-//		Button.waitForAnyPress();
-//		
-//		t.clear();
-//		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-//		t.drawString(" LEFT X-1", 0, 1);
-//		t.drawString(" RIGHT X+1",0, 2);
-//		t.drawString(" UP Y+1", 0, 3);
-//		t.drawString(" DOWN Y-1 ", 0,4 );
-//		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-//		buttonChoice=Button.waitForAnyPress();
-//
-//
-//		while (buttonChoice!=Button.ID_ENTER) {
-//			if(buttonChoice==Button.ID_LEFT) {
-//				xc--;
-//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-//				t.drawString(" LEFT X-1", 0, 1);
-//				t.drawString(" RIGHT X+1",0, 2);
-//				t.drawString(" UP Y+1", 0, 3);
-//				t.drawString(" DOWN Y-1 ", 0,4 );
-//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-//			}
-//			else if(buttonChoice==Button.ID_RIGHT) {
-//				xc++;
-//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-//				t.drawString(" LEFT X-1", 0, 1);
-//				t.drawString(" RIGHT X+1",0, 2);
-//				t.drawString(" UP Y+1", 0, 3);
-//				t.drawString(" DOWN Y-1 ", 0,4 );
-//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-//			}
-//			else if(buttonChoice==Button.ID_UP) {
-//				yc++;
-//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-//				t.drawString(" LEFT X-1", 0, 1);
-//				t.drawString(" RIGHT X+1",0, 2);
-//				t.drawString(" UP Y+1", 0, 3);
-//				t.drawString(" DOWN Y-1 ", 0,4 );
-//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-//			}
-//			else if(buttonChoice==Button.ID_DOWN) {
-//				yc--;
-//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-//				t.drawString(" LEFT X-1", 0, 1);
-//				t.drawString(" RIGHT X+1",0, 2);
-//				t.drawString(" UP Y+1", 0, 3);
-//				t.drawString(" DOWN Y-1 ", 0,4 );
-//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-//			}
-//
-//			buttonChoice=Button.waitForAnyPress();
-//		}
-//		t.clear();
-//		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
-//		t.drawString(" CONFIRMED   ", 0, 3);
-//		
-//		Button.waitForAnyPress();
-//		usLocalizer.doLocalization();	
+		Button.waitForAnyPress();
+				
+		t.clear();
+		t.drawString(" Enter         ", 0, 0);
+		t.drawString(" XC,YC           ", 0, 1);
+		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
+		t.drawString(" TO START         ", 0, 4);
+		Button.waitForAnyPress();
+		
+		t.clear();
+		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+		t.drawString(" LEFT X-1", 0, 1);
+		t.drawString(" RIGHT X+1",0, 2);
+		t.drawString(" UP Y+1", 0, 3);
+		t.drawString(" DOWN Y-1 ", 0,4 );
+		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+		buttonChoice=Button.waitForAnyPress();
+
+
+		while (buttonChoice!=Button.ID_ENTER) {
+			if(buttonChoice==Button.ID_LEFT) {
+				xc--;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_RIGHT) {
+				xc++;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_UP) {
+				yc++;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+			else if(buttonChoice==Button.ID_DOWN) {
+				yc--;
+				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+				t.drawString(" LEFT X-1", 0, 1);
+				t.drawString(" RIGHT X+1",0, 2);
+				t.drawString(" UP Y+1", 0, 3);
+				t.drawString(" DOWN Y-1 ", 0,4 );
+				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+			}
+
+			buttonChoice=Button.waitForAnyPress();
+		}
+		t.clear();
+		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
+		t.drawString(" CONFIRMED   ", 0, 3);
+		
+		usLocalizer.doLocalization();
+		lightLocalizer.doLocalization(1, 1);
+		navigation.travelTo(1, 3);
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
 		System.exit(0);

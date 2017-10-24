@@ -112,7 +112,7 @@ public class LightLocalization {
 		System.out.println("Ynew :" + Ynew);
 		
 		odometer.setPosition(new double [] {Xnew, Ynew, 0}, 
-					new boolean [] {true, true, false});
+					new boolean [] {true, true, true});
 
 	}
 }
