@@ -3,6 +3,7 @@ package localization;
 import lejos.hardware.Sound;
 import lejos.ev3.tools.EV3Console;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.sensor.BaseSensor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
 import localization.Navigator;

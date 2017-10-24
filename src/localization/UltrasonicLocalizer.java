@@ -53,7 +53,7 @@ public class UltrasonicLocalizer {
 	 * fallingEdge() and risingEdge()
 	 * it will execute one of the following
 	 */
-public void doLocalization() {
+	public void doLocalization() {
 		//this is a falling edge 
 		if(LocalizationLab.getFallingEdge()==true) {
 			fallingEdge();
@@ -90,8 +90,6 @@ public void doLocalization() {
 		
 		//rotate clockwise, until it sees the wall
 		while(collectData()==D) {
-			LCD.drawString("Distance:"+collectData(), 0, 4);
-			LCD.drawString("Step 1", 0, 5);
 			leftMotor.forward();
 			rightMotor.backward();
 		}
@@ -101,8 +99,6 @@ public void doLocalization() {
 		
 		boolean isTurning=true;
 		while(isTurning) {
-			LCD.drawString("Distance:"+collectData(), 0, 4);
-			LCD.drawString("Step 2", 0, 5);
 			if(collectData()==D) {
 				leftMotor.stop(true);
 				rightMotor.stop(false);
@@ -119,8 +115,6 @@ public void doLocalization() {
 		//change direction until it doesn't see the wall
 	
 		while(collectData()==D) {
-			LCD.drawString("Distance"+collectData(), 0, 4);
-			LCD.drawString("Step 3", 0, 5);
 			leftMotor.backward();
 			rightMotor.forward();
 		}
@@ -131,8 +125,6 @@ public void doLocalization() {
 		isTurning=true;
 		
 		while(isTurning){
-			LCD.drawString("Distance"+collectData(), 0, 4);
-			LCD.drawString("Step 4", 0, 5);
 			if(collectData()==D) {
 				leftMotor.stop(true);
 				rightMotor.stop(false);
@@ -143,20 +135,16 @@ public void doLocalization() {
 		thetaB=odometer.getThetaDegrees();
 		thetaB=normalizeTheta(thetaB);
 		
-		LCD.drawString("ThetaA:"+thetaA, 0, 6);
-		LCD.drawString("ThetaB"+thetaB, 0, 7);
-		
 		if(thetaA<thetaB) {
 			dT= 45-(int) (thetaA+thetaB)/2;
 		}
 		else if(thetaA>thetaB) {
 			dT=225-(int) ((thetaA + thetaB) /2);
 		}
-		LCD.drawString("DT:"+dT, 0, 3);
 		double currentTheta= odometer.getThetaDegrees();
 		double newtheta= dT+currentTheta;
-		LCD.drawString("Step 5", 0, 5);
-		turnTo(360-newtheta);	
+		turnTo(360-newtheta);
+		odometer.setTheta(0);
 	}
 
 	/**
@@ -175,8 +163,6 @@ public void doLocalization() {
 		
 		//rotate clockwise until it sees no wall
 		while(collectData()<D) {
-			LCD.drawString("Distance"+collectData(), 0, 4);
-			LCD.drawString("Step 1", 0, 5);
 			leftMotor.forward();
 			rightMotor.backward();
 		}
@@ -187,8 +173,6 @@ public void doLocalization() {
 			boolean isTurning=true;
 	
 			while(isTurning) {
-				LCD.drawString("Distance"+collectData(), 0, 4);
-				LCD.drawString("Step 2", 0, 5);
 				if(collectData()<D) {
 					leftMotor.stop(true);
 					rightMotor.stop(false);
@@ -201,8 +185,6 @@ public void doLocalization() {
 		
 		//switch direction until it sees no wall
 		while(collectData()<D) {
-			LCD.drawString("Distance"+collectData(), 0, 4);
-			LCD.drawString("Step 3", 0, 5);
 			leftMotor.backward();
 			rightMotor.forward();
 		}
@@ -213,8 +195,6 @@ public void doLocalization() {
 		
 		isTurning=true;
 		while(isTurning) {
-			LCD.drawString("Distance"+collectData(), 0, 4);
-			LCD.drawString("Step 4", 0, 5);
 			if(collectData()<D) {
 				leftMotor.stop(true);
 				rightMotor.stop(false);
@@ -226,8 +206,6 @@ public void doLocalization() {
 		thetaB=odometer.getThetaDegrees();
 		thetaB=normalizeTheta(thetaB);
 		Sound.beep();
-		LCD.drawString("ThetaA:"+thetaA, 0, 6);
-		LCD.drawString("ThetaB"+thetaB, 0, 7);
 		
 		if(thetaA>thetaB) {
 			dT= 45-(int) (thetaA+thetaB)/2;
@@ -235,10 +213,8 @@ public void doLocalization() {
 		else if(thetaA<thetaB) {
 			dT= 225-(int) (thetaA+thetaB)/2;
 		}
-		LCD.drawString("DT:"+dT, 0, 3);
 		double currentTheta= odometer.getThetaDegrees();
 		double newtheta=currentTheta+dT;
-		LCD.drawString("Step 5", 0, 5);
 		turnTo(360-newtheta);
 	}
 	

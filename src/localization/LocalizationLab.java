@@ -21,19 +21,19 @@ import lejos.robotics.SampleProvider;
  */
 public class LocalizationLab {
 
-	private SampleProvider colorSensor;
-	private float[] colorSample;
 	//create the ports
 	private static final EV3LargeRegulatedMotor leftMotor = 
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port usPort = LocalEV3.get().getPort("S4");
-	private static final Port colorPort=LocalEV3.get().getPort("S3");
+	private static final Port usPort = LocalEV3.get().getPort("S1");
+	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
 	private static boolean isFallingEdge;
 	private static double WHEEL_BASE = 10.8;
 	private static double WHEEL_RADIUS = 2.1;
 	
+	private static SampleProvider colorSensor;
+	private static float[] colorData;
 
 	/**
 	 * TODO
@@ -52,15 +52,15 @@ public class LocalizationLab {
 		Navigator navigation = new Navigator(leftMotor, rightMotor, odometer);
 
 
-		//created for the distance measured
-		//@SuppressWarnings("resource") // Because we don't bother to close this resource
-		SensorModes colorSensor= new EV3ColorSensor(colorPort);
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
 		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
-		SampleProvider colorValue=colorSensor.getMode("Red");
 		// this instance
 		float[] usData = new float[usDistance.sampleSize()];
-		float[] lightValue=new float[colorValue.sampleSize()];
+		
+		SensorModes colorMode = lightSensor;
+		SampleProvider colorSensor = colorMode.getMode("Red");
+		float[] colorData = new float[colorMode.sampleSize()];
+		
 		// usData is the buffer in which data are
 		// returned  
 		do {
@@ -101,6 +101,7 @@ public class LocalizationLab {
 			odometrydisplay.start();
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
+			odometer.setTheta(0);
 		}
 
 		else {
@@ -108,10 +109,11 @@ public class LocalizationLab {
 			odometrydisplay.start();
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
-
+			odometer.setTheta(0);
+			
 			buttonChoice=Button.waitForAnyPress();
 			if(buttonChoice==Button.ID_ENTER) {
-				lightLocalizer = new LightLocalization (odometer, colorSensor,lightValue, navigation);
+				lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
 				lightLocalizer.doLocalization();
 			}
 		}
