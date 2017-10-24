@@ -11,6 +11,17 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import localization.*;
 
+/**
+ * @author 
+ * Mohamed Reda El-Khili
+ * Adam Gobran
+ * Marine Huynh
+ * Sihui Shen
+ * Ali Shobeiri
+ * Abraham Yesgat
+ * @version 1.1
+ */
+
 public class ZiplineLab {
 
 	private SampleProvider colorSensor;
@@ -26,7 +37,10 @@ public class ZiplineLab {
 
 
 	/**
-	 * TODO
+	 * main method that will display on the brick an interface
+	 * that the client will be able to pass the coordinate of xo, yo, xc, yc, and the cornerStart
+	 * (xo, yo) are the coordinates where the robot will need to reach before mounting the zipline
+	 * (xc, yc) are the coordinates where the robot will pass by to mount the zipline
 	 * @param args
 	 * @return nothing 
 	 */
