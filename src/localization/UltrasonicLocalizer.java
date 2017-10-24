@@ -112,7 +112,7 @@ public void doLocalization() {
 		Sound.beep();
 
 
-		thetaA=odometer.getTheta();
+		thetaA=odometer.getThetaDegrees();
 		thetaA=normalizeTheta(thetaA);
 		Sound.beep();
 		
@@ -140,7 +140,7 @@ public void doLocalization() {
 			}
 		}
 		Sound.beep();
-		thetaB=odometer.getTheta();
+		thetaB=odometer.getThetaDegrees();
 		thetaB=normalizeTheta(thetaB);
 		
 		LCD.drawString("ThetaA:"+thetaA, 0, 6);
@@ -153,7 +153,7 @@ public void doLocalization() {
 			dT=225-(int) ((thetaA + thetaB) /2);
 		}
 		LCD.drawString("DT:"+dT, 0, 3);
-		double currentTheta= odometer.getTheta();
+		double currentTheta= odometer.getThetaDegrees();
 		double newtheta= dT+currentTheta;
 		LCD.drawString("Step 5", 0, 5);
 		turnTo(360-newtheta);	
@@ -196,7 +196,7 @@ public void doLocalization() {
 				}
 			}
 		Sound.beep();
-		thetaA=odometer.getTheta();
+		thetaA=odometer.getThetaDegrees();
 		thetaA=normalizeTheta(thetaA);
 		
 		//switch direction until it sees no wall
@@ -223,7 +223,7 @@ public void doLocalization() {
 		}
 		Sound.beep();
 		
-		thetaB=odometer.getTheta();
+		thetaB=odometer.getThetaDegrees();
 		thetaB=normalizeTheta(thetaB);
 		Sound.beep();
 		LCD.drawString("ThetaA:"+thetaA, 0, 6);
@@ -236,7 +236,7 @@ public void doLocalization() {
 			dT= 225-(int) (thetaA+thetaB)/2;
 		}
 		LCD.drawString("DT:"+dT, 0, 3);
-		double currentTheta= odometer.getTheta();
+		double currentTheta= odometer.getThetaDegrees();
 		double newtheta=currentTheta+dT;
 		LCD.drawString("Step 5", 0, 5);
 		turnTo(360-newtheta);
