@@ -1,6 +1,7 @@
 package localization;
 
 
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 import localization.Odometer;
@@ -12,8 +13,8 @@ public class Navigator {
 	private static Odometer odometer;
 	private static EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private static final double RADIUS = 2.1;
-	private static final double TRACK = 10.8;
-	private final int MOTOR_ACCELERATION = 200;
+	private static final double TRACK = 9.75;
+	private final int MOTOR_ACCELERATION = 50;
 	
 	// navigation variables
 	public static final int FORWARD_SPEED = 250, ROTATE_SPEED = 100;
@@ -26,17 +27,18 @@ public class Navigator {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
 		this.odometer = odometer;
+		this.leftMotor.setAcceleration(MOTOR_ACCELERATION);
+		this.rightMotor.setAcceleration(MOTOR_ACCELERATION);
 	}
 	
-	// Convert how far they need to travel
 	private static int convertDistance(double radius, double distance) {
-		return (int) ((180.0 * distance) / (Math.PI * radius));
+		return (int) ((180*distance) / (Math.PI * radius));
 	}
 
-
-	// Determine the angle the motors need to turn
-	private static int convertAngle(double radius, double TRACK, double angle) {
-		return convertDistance(radius, Math.PI * TRACK * angle / 360.0);
+	private static int convertAngle(double radius, double width, double angle) {
+		int output = convertDistance(radius, Math.PI * width * angle / 360.0);
+		System.out.println(output);
+		return output;
 	}
 	
 
@@ -73,8 +75,6 @@ public class Navigator {
 
 		leftMotor.stop(true);
 		rightMotor.stop(true);
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
 	}
 	
 
@@ -82,17 +82,22 @@ public class Navigator {
 	public void turnTo(double theta, boolean block) {
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
+		int angle = convertAngle(RADIUS, TRACK, theta);
+
+		LCD.drawString(Integer.toString(angle), 0, 4);
+		LCD.drawString(Double.toString(theta), 0, 5);
 		
 		if(theta < 0) { // if angle is negative, turn to the left
-			leftMotor.rotate(-convertAngle(RADIUS, TRACK, -theta), true);
-			rightMotor.rotate(convertAngle(RADIUS, TRACK, -theta), block);
+			LCD.drawString("Negative", 0, 6);
+			leftMotor.rotate(angle, true);
+			rightMotor.rotate(-angle, block);
 			
-		} 
-		else { // angle is positive, turn to the right
-			leftMotor.rotate(convertAngle(RADIUS, TRACK, theta), true);
-			rightMotor.rotate(-convertAngle(RADIUS, TRACK, theta), block);
+		} else { // angle is positive, turn to the right
+			LCD.drawString("Positive", 0, 6);
+			leftMotor.rotate(angle, true);
+			rightMotor.rotate(-angle, block);
 		}
-		
+
 	}
 	
 	

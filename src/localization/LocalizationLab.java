@@ -29,7 +29,7 @@ public class LocalizationLab {
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
 	private static boolean isFallingEdge;
-	private static double WHEEL_BASE = 10.8;
+	private static double WHEEL_BASE = 9.75;
 	private static double WHEEL_RADIUS = 2.1;
 	
 	private static SampleProvider colorSensor;
@@ -74,7 +74,7 @@ public class LocalizationLab {
 			t.drawString("         |        ", 0, 4);
 			buttonChoice= Button.waitForAnyPress();
 		} while (buttonChoice!=Button.ID_LEFT && buttonChoice!=Button.ID_RIGHT);
-
+		
 		if(buttonChoice==Button.ID_LEFT) {
 			setFallingEdge(true);
 		}
@@ -101,21 +101,16 @@ public class LocalizationLab {
 			odometrydisplay.start();
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
-			odometer.setTheta(0);
-		}
-
-		else {
+		} else {
 			odometer.start();
 			odometrydisplay.start();
+			t.clear();
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
-			odometer.setTheta(0);
-			
-			buttonChoice=Button.waitForAnyPress();
-			if(buttonChoice==Button.ID_ENTER) {
-				lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
-				lightLocalizer.doLocalization();
-			}
+			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
+			lightLocalizer.doLocalization();
+			navigation.travelTo(0, 2);
+			navigation.travelTo(2, 2);
 		}
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);

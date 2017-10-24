@@ -143,8 +143,9 @@ public class UltrasonicLocalizer {
 		}
 		double currentTheta= odometer.getThetaDegrees();
 		double newtheta= dT+currentTheta;
-		turnTo(360-newtheta);
-		odometer.setTheta(0);
+		odometer.setTheta(newtheta);
+		turnTo(-newtheta+20);
+		//odometer.setTheta(0);
 	}
 
 	/**
@@ -215,7 +216,10 @@ public class UltrasonicLocalizer {
 		}
 		double currentTheta= odometer.getThetaDegrees();
 		double newtheta=currentTheta+dT;
-		turnTo(360-newtheta);
+		odometer.setTheta(newtheta);
+		turnTo(-newtheta);
+		odometer.setPosition(new double [] {0, 0, 0}, 
+				new boolean [] {true, true, true});
 	}
 	
 	/**

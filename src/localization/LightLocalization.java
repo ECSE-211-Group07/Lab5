@@ -15,7 +15,7 @@ import lejos.robotics.SampleProvider;
 public class LightLocalization {
 	private Odometer odometer;
 	private Navigator navigation;
-	private static double SENSOR_DISTANCE = 14;
+	private static double SENSOR_DISTANCE = 18;
 	double [] lightData;
 	
 	private SampleProvider colorSensor;
@@ -44,9 +44,9 @@ public class LightLocalization {
 		navigation.travelTo(0, 0);
 		
 		// Corrects theta value
-		correctAngle();
+		navigation.turnTo(-50, false);
 		
-		navigation.setSpeed(0,0);
+		// navigation.setSpeed(0,0);
 	}
 	
 	/*
@@ -85,7 +85,7 @@ public class LightLocalization {
 		int lineIndex=1;
 		while(navigation.isNavigating()) {
 			colorSensor.fetchSample(colorData, 0);
-			if(colorData[0] < 0.35 && lineIndex < 5) {
+			if(colorData[0] < 0.25 && lineIndex < 5) {
 				lightData[lineIndex]=odometer.getThetaDegrees();
 				lineIndex++;
 				Sound.beep();
@@ -103,15 +103,12 @@ public class LightLocalization {
 		double deltaThetaY= Math.abs(lightData[1]-lightData[3]);
 		double deltaThetaX= Math.abs(lightData[2]-lightData[4]);
 		
-		double deltaTheta = 270 + (deltaThetaY)/2 - (lightData[1]);
-		
 		//use trig to determine position of the robot 
-		double Xnew = SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaX)) + odometer.getX();
-		double Ynew = SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaY)) + odometer.getY();
-		double Tnew = -deltaTheta + odometer.getThetaDegrees();
+		double Xnew = -SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaY) / 2);
+		double Ynew = -SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaX) / 2);
 		
-		odometer.setPosition(new double [] {Xnew, Ynew, Tnew}, 
-					new boolean [] {true, true, true});
+		odometer.setPosition(new double [] {Xnew, Ynew, 0}, 
+					new boolean [] {true, true, false});
 
 	}
 }
