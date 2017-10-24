@@ -108,9 +108,11 @@ public class LocalizationLab {
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
 			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
-			lightLocalizer.doLocalization();
-			navigation.travelTo(0, 2);
-			navigation.travelTo(2, 2);
+			lightLocalizer.doLocalization(0, 0);
+			navigation.travelTo(1, 2);
+			lightLocalizer.doLocalization(1, 2);
+			//navigation.travelTo(7, 2);
+			//navigation.travelTo(6, 2);
 		}
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);

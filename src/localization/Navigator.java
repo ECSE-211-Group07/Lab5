@@ -27,8 +27,8 @@ public class Navigator {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
 		this.odometer = odometer;
-		this.leftMotor.setAcceleration(MOTOR_ACCELERATION);
-		this.rightMotor.setAcceleration(MOTOR_ACCELERATION);
+//		this.leftMotor.setAcceleration(MOTOR_ACCELERATION);
+//		this.rightMotor.setAcceleration(MOTOR_ACCELERATION);
 	}
 	
 	private static int convertDistance(double radius, double distance) {
