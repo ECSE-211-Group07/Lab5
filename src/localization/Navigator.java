@@ -6,6 +6,12 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 import localization.Odometer;
 
+/**
+ * Navigator class that moves the robot to specific coordinates
+ * @author adam
+ * @version1.1
+ *
+ */
 public class Navigator {
 	
 	
@@ -28,14 +34,25 @@ public class Navigator {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
 		this.odometer = odometer;
-//		this.leftMotor.setAcceleration(MOTOR_ACCELERATION);
-//		this.rightMotor.setAcceleration(MOTOR_ACCELERATION);
+		this.zipMotor = zipMotor;
 	}
-	
+	/**
+	 * method that converts tachometer to distances 
+	 * @param radius
+	 * @param distance
+	 * @return
+	 */
 	private static int convertDistance(double radius, double distance) {
 		return (int) ((180*distance) / (Math.PI * radius));
 	}
 
+	/**
+	 * 
+	 * @param radius
+	 * @param width
+	 * @param angle
+	 * @return
+	 */
 	private static int convertAngle(double radius, double width, double angle) {
 		int output = convertDistance(radius, Math.PI * width * angle / 360.0);
 		System.out.println(output);
@@ -44,6 +61,13 @@ public class Navigator {
 	
 
 	// Drives robot to specified cartesian coordinate
+	/**
+	 * method that takes in x and y coordinates and calculates its distance 
+	 * and angle to reach that point
+	 * @param x, coordinate passed on the x-axis
+	 * @param y, coordinate passed on the y-axis
+	 * @return nothing
+	 */
 	public void travelTo(double x, double y) {
 		x= x*30.48;
 		y= y*30.48;

@@ -207,13 +207,9 @@ public class LocalizationLab {
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
 			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
-			lightLocalizer.doLocalization(1, 1);
-			navigation.turnTo(-10, false);
+			lightLocalizer.doLocalization(1, 7);
 			navigation.travelTo(xo, yo);
-			navigation.turnTo(90, false);
 			lightLocalizer.doLocalization(xo, yo);
-			//navigation.travelTo(7, 2);
-			//navigation.travelTo(6, 2);
 		}
 		
 		navigation.driveZipline();

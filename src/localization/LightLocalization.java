@@ -51,9 +51,10 @@ public class LightLocalization {
 		// navigation.setSpeed(0,0);
 	}
 	
-	/*
+	/**
 	 * Corrects angle of theta and stops the robot if it runs over 
 	 * another set of lines
+	 * @return nothing
 	 */
 	public void correctAngle() {
 		navigation.turnTo(-odometer.getThetaDegrees()%360, true);
@@ -69,9 +70,10 @@ public class LightLocalization {
 		
 	}
 	
-	/* 
+	/** 
 	* These next two calls will drive our robot to a 
 	* region which will allow it rotate and scan the lines
+	* @return nothing
 	*/ 
 	private void goToApproxOrigin() {
 		navigation.turnTo(45, false);
@@ -79,8 +81,11 @@ public class LightLocalization {
 		navigation.driveDistance(15, true);
 	}
 	
-	/* Rotates sensor around the origin and saves the theta 
-	 * which the point was encoutered at
+
+	/**
+	 * rotate sensor around the origin and saves the theta which the point
+	 * was encounted at
+	 * @ return nothing
 	 */
 	private void rotateLightSensor() {
 		navigation.turnTo(-360, true);
@@ -98,7 +103,10 @@ public class LightLocalization {
 	
 	
 	/**
-	 * Uses mathematical calculations to compute the correct robot position
+	 * Method that uses mathematical calculations to compute the correct robot position
+	 * @param x, coordinate x
+	 * @param y, coordinate y
+	 * @return nothing
 	 */
 	private void correctPosition(double x, double y) {
 		//compute difference in angles
