@@ -49,7 +49,7 @@ public class LocalizationLab {
 		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
 		UltrasonicLocalizer usLocalizer;
 		LightLocalization lightLocalizer;
-		Navigator navigation = new Navigator(leftMotor, rightMotor, zipMotor, odometer);
+		Navigation navigator = new Navigation();
 
 
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
@@ -206,17 +206,15 @@ public class LocalizationLab {
 			t.clear();
 			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
 			usLocalizer.doLocalization();
-			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigation);
+			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigator);
 			lightLocalizer.doLocalization(1, 1);
-			navigation.turnTo(-10, false);
-			navigation.travelTo(xo, yo);
-			navigation.turnTo(90, false);
+			navigator.turnTo(-10, false);
+			navigator.travelTo(xo, yo);
+			navigator.turnTo(90, false);
 			lightLocalizer.doLocalization(xo, yo);
-			//navigation.travelTo(7, 2);
-			//navigation.travelTo(6, 2);
 		}
 		
-		navigation.driveZipline();
+		navigator.driveZipline();
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
 		System.exit(0);

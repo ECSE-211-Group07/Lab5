@@ -6,7 +6,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.sensor.BaseSensor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
-import localization.Navigator;
+import localization.Navigation;
 import localization.Odometer;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.Color;
@@ -14,7 +14,7 @@ import lejos.robotics.SampleProvider;
 
 public class LightLocalization {
 	private Odometer odometer;
-	private Navigator navigation;
+	private Navigation navigation;
 	private static double SENSOR_DISTANCE = 24;//18
 	double [] lightData;
 	
@@ -22,7 +22,7 @@ public class LightLocalization {
 	private float[] colorData;
 
 	public LightLocalization(Odometer odometer, SampleProvider colorSensor,
-						  float[] colorData, Navigator navigator) {
+						  float[] colorData, Navigation navigator) {
 		this.odometer = odometer;
 		this.navigation = navigator;
 		this.lightData = new double [5];
@@ -45,39 +45,11 @@ public class LightLocalization {
 		navigation.travelTo(x, y);
 		
 		// Corrects theta value
-		System.out.println("theta :" + Double.toString(odometer.getTheta()));
 		navigation.turnTo(-50, false);
 		
 		// navigation.setSpeed(0,0);
 	}
 	
-	/*
-	 * Corrects angle of theta and stops the robot if it runs over 
-	 * another set of lines
-	 */
-	public void correctAngle() {
-		navigation.turnTo(-odometer.getThetaDegrees()%360, true);
-		
-		colorSensor.fetchSample(colorData, 0);
-		while (navigation.isNavigating()) {
-//			if(colorData[0] < 0.35 && (odometer.getThetaDegrees() < 20 || odometer.getThetaDegrees() > 340)) {
-//				navigation.synchronizeStop();
-//				break;
-//			}
-			colorSensor.fetchSample(colorData, 0);
-		}
-		
-	}
-	
-	/* 
-	* These next two calls will drive our robot to a 
-	* region which will allow it rotate and scan the lines
-	*/ 
-	private void goToApproxOrigin() {
-		navigation.turnTo(45, false);
-
-		navigation.driveDistance(15, true);
-	}
 	
 	/* Rotates sensor around the origin and saves the theta 
 	 * which the point was encoutered at
@@ -93,7 +65,6 @@ public class LightLocalization {
 				Sound.beep();
 			}
 		}
-		// navigation.setSpeed(0,0);
 	}
 	
 	
