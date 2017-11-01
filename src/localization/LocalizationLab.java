@@ -231,7 +231,7 @@ public class LocalizationLab {
 
 	/**
 	 * setter for the falling edge
-	 * @param isFallingEdge
+	 * @param isFallingEdge boolean that represents if we are using falling or rising edge localization method
 	 * @return nothing
 	 */
 	public static void setFallingEdge(boolean isFallingEdge) {

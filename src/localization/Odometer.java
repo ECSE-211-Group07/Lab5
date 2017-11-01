@@ -24,9 +24,9 @@ public class Odometer extends Thread {
 
 	
 	/** Constructs Odometer
-	 * @param leftMotor
-	 * @param rightMotor
-	 * @param track
+	 * @param leftMotor motor which robot will use to guide left wheel
+	 * @param rightMotor motor which robot will use to guide right wheel
+	 * @param track distance between left and right wheel
 	 */
 	public Odometer(EV3LargeRegulatedMotor leftMotor,EV3LargeRegulatedMotor rightMotor, double track) {
 		this.leftMotor = leftMotor;
@@ -172,7 +172,7 @@ public class Odometer extends Thread {
 
 	
 	/** Updates x, y, and theta in one function call
-	 * @param position
+	 * @param position array containing x, y, and theta
 	 * @param update
 	 */
 	public void setPosition(double[] position, boolean[] update) {
@@ -188,7 +188,7 @@ public class Odometer extends Thread {
 	}
 
 	/** Sets class variable x to desired coordinate in cm relative to x = 0
-	 * @param x
+	 * @param x desired x
 	 */
 	public void setX(double x) {
 		synchronized (lock) {
@@ -198,7 +198,7 @@ public class Odometer extends Thread {
 	
 	
 	/** Sets class variable y to desired coordinate in cm relative to y = 0
-	 * @param y
+	 * @param y desired y
 	 */
 	public void setY(double y) {
 		synchronized (lock) {
@@ -208,7 +208,7 @@ public class Odometer extends Thread {
 	
 	
 	/** Sets theta class variable to desired angle in degrees
-	 * @param theta
+	 * @param theta desired theta
 	 */
 	public void setTheta(double theta) {
 		synchronized (lock) {
