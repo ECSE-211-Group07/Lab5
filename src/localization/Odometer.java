@@ -2,8 +2,9 @@ package localization;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
-/**
- * @author adam
+/** Odometer uses the number of wheel rotations the robot has completed, along with some simple trigonometry to
+ * determine the robot's x, y, and theta coordinates.
+ * @author Marine Huynh, Sihui Shen
  *
  */
 public class Odometer extends Thread {

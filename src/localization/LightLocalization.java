@@ -12,6 +12,11 @@ import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.Color;
 import lejos.robotics.SampleProvider;
 
+/** LightLocaliztion uses one light sensor to detect lines around the robot and ultimately precisely travel to 
+ * a given coordinate.
+ * @author Adam Gobran, Ali Shobeiri, Abe Yesgat, Reda El Khili
+ *
+ */
 public class LightLocalization {
 	private Odometer odometer;
 	private Navigation navigation;
