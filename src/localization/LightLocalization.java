@@ -21,6 +21,13 @@ public class LightLocalization {
 	private SampleProvider colorSensor;
 	private float[] colorData;
 
+	/** Constructor for LightLocalization object that allows EV3 Robot to localize about a point (x, y) 
+	 *  using a light sensor and basic trigonometry 
+	 * @param odometer
+	 * @param colorSensor
+	 * @param colorData
+	 * @param navigator
+	 */
 	public LightLocalization(Odometer odometer, SampleProvider colorSensor,
 						  float[] colorData, Navigation navigator) {
 		this.odometer = odometer;
@@ -30,6 +37,10 @@ public class LightLocalization {
 		this.colorData = colorData;
 	}
 
+	/** Localizes about a point (x, y) by calling subsequent helper functions
+	 * @param x
+	 * @param y
+	 */
 	public void doLocalization(double x, double y) {
 
 		// goToApproxOrigin();
@@ -68,8 +79,10 @@ public class LightLocalization {
 	}
 	
 	
-	/**
-	 * Uses mathematical calculations to compute the correct robot position
+	
+	/** Uses mathematical calculations to compute the correct robot position
+	 * @param x
+	 * @param y
 	 */
 	private void correctPosition(double x, double y) {
 		//compute difference in angles
