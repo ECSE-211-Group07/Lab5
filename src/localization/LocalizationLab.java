@@ -48,7 +48,7 @@ public class LocalizationLab {
 		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
 		UltrasonicLocalizer usLocalizer;
 		LightLocalization lightLocalizer;
-		Navigation navigator = new Navigation();
+		Navigation navigator = new Navigation(leftMotor, rightMotor, odometer);
 
 
 		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance

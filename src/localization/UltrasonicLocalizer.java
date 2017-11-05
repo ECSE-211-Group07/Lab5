@@ -213,10 +213,19 @@ public class UltrasonicLocalizer {
 		else if(thetaA<thetaB) {
 			dT= 225-(int) (thetaA+thetaB)/2;
 		}
+		System.out.println("ThetaA: " + thetaA);
+		System.out.println("ThetaB: " + thetaB);
+		System.out.println("dT: " + dT);
 		double currentTheta= odometer.getThetaDegrees();
+		System.out.println("currentTheta: " + currentTheta);
 		double newtheta=currentTheta+dT;
+		System.out.println("newtheta: " + newtheta);
 		odometer.setTheta(newtheta);
-		turnTo(-newtheta);
+		if (newtheta > 180) {
+			turnTo(360 - newtheta);
+		} else {
+			turnTo(-newtheta);
+		}
 		odometer.setPosition(new double [] {0, 0, 0}, 
 				new boolean [] {true, true, true});
 	}

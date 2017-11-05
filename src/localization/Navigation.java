@@ -1,7 +1,6 @@
 package localization;
 
 
-import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 import localization.Odometer;
@@ -13,8 +12,8 @@ import localization.Odometer;
  */
 public class Navigation {
 	
-	private static Odometer odometer;
-	private static EV3LargeRegulatedMotor leftMotor, rightMotor, zipMotor;
+	private Odometer odometer;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor, zipMotor;
 	private static final double RADIUS = Resources.getRadius();
 	private static final double TRACK = Resources.getTrack();
 
@@ -24,12 +23,14 @@ public class Navigation {
 
 	/**
 	 * Primary navigation point of the program, performs all navigation based functions
+	 * @param odometer2 
+	 * @param rightmotor 
+	 * @param leftmotor 
 	 */
-	public Navigation() {
-		this.leftMotor = Resources.getLeftMotor();
-		this.rightMotor = Resources.getRightMotor();
-		this.odometer = Resources.getOdometer();
-		this.zipMotor = Resources.getZipMotor();
+	public Navigation(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, Odometer odometer) {
+		this.leftMotor = leftMotor;
+		this.rightMotor = rightMotor;
+		this.odometer = odometer;
 	}
 	
 

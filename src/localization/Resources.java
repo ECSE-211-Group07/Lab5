@@ -17,7 +17,7 @@ public class Resources {
 	private static EV3UltrasonicSensor ultrasonicSensor;
 	private static EV3ColorSensor lightSensor;
 	private static Odometer odometer;
-	private static final double TRACK = 9.75;
+	private static final double TRACK = 12.25;
 	private static final double RADIUS = 2.1;
 	
 	/**
