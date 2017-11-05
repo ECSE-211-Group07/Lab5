@@ -21,14 +21,14 @@ import lejos.robotics.SampleProvider;
 public class LocalizationLab {
 
 	//create the ports
-	private static final EV3LargeRegulatedMotor leftMotor = 
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final EV3LargeRegulatedMotor rightMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor zipMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+//	private static final EV3LargeRegulatedMotor leftMotor = 
+//			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+//	private static final EV3LargeRegulatedMotor rightMotor =
+//			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+//	private static final EV3LargeRegulatedMotor zipMotor =
+//			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
-	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
+//	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
 	private static boolean isFallingEdge;
 	private static double WHEEL_BASE = 9.75;
 	private static double WHEEL_RADIUS = 2.1;
@@ -40,160 +40,164 @@ public class LocalizationLab {
 	 * @return nothing 
 	 */
 	public static void main(String[] args) {
+		Resources resources = new Resources("A", "D", "B", "S4", "S1");
 		int buttonChoice=0;
 
 		//create the instances
 		final TextLCD t=LocalEV3.get().getTextLCD();
-		Odometer odometer=new Odometer(leftMotor,rightMotor, WHEEL_BASE);
+		Odometer odometer=new Odometer();
 		OdometryDisplay odometrydisplay=new OdometryDisplay(odometer,t);
 		UltrasonicLocalizer usLocalizer;
 		LightLocalization lightLocalizer;
-		Navigation navigator = new Navigation(leftMotor, rightMotor, odometer);
+		Navigation navigator = new Navigation();
 
 
-		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
-		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
-		// this instance
-		float[] usData = new float[usDistance.sampleSize()];
+
+//		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
+//		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
+//		// this instance
+//		float[] usData = new float[usDistance.sampleSize()];
 		
-		SensorModes colorMode = lightSensor;
+		SensorModes colorMode = Resources.getColorSensor();
 		SampleProvider colorSensor = colorMode.getMode("Red");
 		float[] colorData = new float[colorMode.sampleSize()];
+		t.drawString("  TO START           ", 0, 3);
+		buttonChoice=Button.waitForAnyPress();
 		
 		// usData is the buffer in which data are
 		// returned  
 
-		// initiate integer to store coordinates
-		int xo=0;
-		int yo=0;
-		int xc=0;
-		int yc=0;
-
-		t.clear();
-		t.drawString("  Enter         ", 0, 0);
-		t.drawString("  X0, Y0           ", 0, 1);	
-		t.drawString("  PRESS ANYBUTTON  ", 0, 2);
-		t.drawString("  TO START           ", 0, 3);
-		Button.waitForAnyPress();
-
-		t.clear();
-		t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-		t.drawString(" LEFT X-1", 0, 1);
-		t.drawString(" RIGHT X+1",0, 2);
-		t.drawString(" UP Y+1", 0, 3);
-		t.drawString(" DOWN Y-1 ", 0,4 );
-		t.drawString(" CONFIRM PRESS ENTER ", 0, 5);
-
-		buttonChoice= Button.waitForAnyPress();
-		t.clear();
-		while (buttonChoice!=Button.ID_ENTER) {
-			if(buttonChoice==Button.ID_LEFT) {
-				xo--;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_RIGHT) {
-				xo++;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_UP) {
-				yo++;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_DOWN) {
-				yo--;
-				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-
-			buttonChoice=Button.waitForAnyPress();
-		}
-		t.clear();
-		t.drawString(" X0="+xo +"Yo="+yo   , 0, 0);
-
-		t.drawString("   CONFIRMED   ", 0, 3);
-		
-		Button.waitForAnyPress();
-				
-		t.clear();
-		t.drawString(" Enter         ", 0, 0);
-		t.drawString(" XC,YC           ", 0, 1);
-		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
-		t.drawString(" TO START         ", 0, 4);
-		Button.waitForAnyPress();
-		
-		t.clear();
-		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-		t.drawString(" LEFT X-1", 0, 1);
-		t.drawString(" RIGHT X+1",0, 2);
-		t.drawString(" UP Y+1", 0, 3);
-		t.drawString(" DOWN Y-1 ", 0,4 );
-		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-		buttonChoice=Button.waitForAnyPress();
-
-
-		while (buttonChoice!=Button.ID_ENTER) {
-			if(buttonChoice==Button.ID_LEFT) {
-				xc--;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_RIGHT) {
-				xc++;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_UP) {
-				yc++;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-			else if(buttonChoice==Button.ID_DOWN) {
-				yc--;
-				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
-				t.drawString(" LEFT X-1", 0, 1);
-				t.drawString(" RIGHT X+1",0, 2);
-				t.drawString(" UP Y+1", 0, 3);
-				t.drawString(" DOWN Y-1 ", 0,4 );
-				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
-			}
-
-			buttonChoice=Button.waitForAnyPress();
-		}
-		t.clear();
-		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
-		t.drawString(" CONFIRMED   ", 0, 3);
-		setFallingEdge(true);
+//		// initiate integer to store coordinates
+//		int xo=0;
+//		int yo=0;
+//		int xc=0;
+//		int yc=0;
+//
+//		t.clear();
+//		t.drawString("  Enter         ", 0, 0);
+//		t.drawString("  X0, Y0           ", 0, 1);	
+//		t.drawString("  PRESS ANYBUTTON  ", 0, 2);
+//		t.drawString("  TO START           ", 0, 3);
+//		Button.waitForAnyPress();
+//
+//		t.clear();
+//		t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//		t.drawString(" LEFT X-1", 0, 1);
+//		t.drawString(" RIGHT X+1",0, 2);
+//		t.drawString(" UP Y+1", 0, 3);
+//		t.drawString(" DOWN Y-1 ", 0,4 );
+//		t.drawString(" CONFIRM PRESS ENTER ", 0, 5);
+//
+//		buttonChoice= Button.waitForAnyPress();
+//		t.clear();
+//		while (buttonChoice!=Button.ID_ENTER) {
+//			if(buttonChoice==Button.ID_LEFT) {
+//				xo--;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_RIGHT) {
+//				xo++;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_UP) {
+//				yo++;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_DOWN) {
+//				yo--;
+//				t.drawString(" Xo="+xo +"Yo="+yo, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//
+//			buttonChoice=Button.waitForAnyPress();
+//		}
+//		t.clear();
+//		t.drawString(" X0="+xo +"Yo="+yo   , 0, 0);
+//
+//		t.drawString("   CONFIRMED   ", 0, 3);
+//		
+//		Button.waitForAnyPress();
+//				
+//		t.clear();
+//		t.drawString(" Enter         ", 0, 0);
+//		t.drawString(" XC,YC           ", 0, 1);
+//		t.drawString(" PRESS ANYBUTTON  ", 0, 3);
+//		t.drawString(" TO START         ", 0, 4);
+//		Button.waitForAnyPress();
+//		
+//		t.clear();
+//		t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//		t.drawString(" LEFT X-1", 0, 1);
+//		t.drawString(" RIGHT X+1",0, 2);
+//		t.drawString(" UP Y+1", 0, 3);
+//		t.drawString(" DOWN Y-1 ", 0,4 );
+//		t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//		buttonChoice=Button.waitForAnyPress();
+//
+//
+//		while (buttonChoice!=Button.ID_ENTER) {
+//			if(buttonChoice==Button.ID_LEFT) {
+//				xc--;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_RIGHT) {
+//				xc++;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_UP) {
+//				yc++;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//			else if(buttonChoice==Button.ID_DOWN) {
+//				yc--;
+//				t.drawString(" Xc="+xc +"Yc="+yc, 0, 0);
+//				t.drawString(" LEFT X-1", 0, 1);
+//				t.drawString(" RIGHT X+1",0, 2);
+//				t.drawString(" UP Y+1", 0, 3);
+//				t.drawString(" DOWN Y-1 ", 0,4 );
+//				t.drawString(" CONFIRM PRESS ENTER  ", 0, 5);
+//			}
+//
+//			buttonChoice=Button.waitForAnyPress();
+//		}
+//		t.clear();
+//		t.drawString(" Xc="+xc+"Yc="+yc, 0, 0);
+//		t.drawString(" CONFIRMED   ", 0, 3);
+//		setFallingEdge(true);
 
 		do {
 
@@ -203,17 +207,18 @@ public class LocalizationLab {
 			odometer.start();
 			odometrydisplay.start();
 			t.clear();
-			usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usSensor, usData);
+			usLocalizer = new UltrasonicLocalizer(odometer);
 			usLocalizer.doLocalization();
-			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigator);
-			lightLocalizer.doLocalization(1, 1);
-			navigator.turnTo(-10, false);
-			navigator.travelTo(xo, yo);
-			navigator.turnTo(90, false);
-			lightLocalizer.doLocalization(xo, yo);
+//			lightLocalizer = new LightLocalization(odometer, colorSensor, colorData, navigator);
+//			Navigation.driveDistance(10, true);
+//			lightLocalizer.doLocalization(1, 1);
+//			Navigator.turnTo(-10, false);
+//			Navigation.travelTo(0, 0);
+//			Navigation.turnTo(90, false);
+//			lightLocalizer.doLocalization(0, 0);
 		}
 		
-		navigator.driveZipline();
+		// navigator.driveZipline();
 
 		while(Button.waitForAnyPress()!=Button.ID_ESCAPE);
 		System.exit(0);

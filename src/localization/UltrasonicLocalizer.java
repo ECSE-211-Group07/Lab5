@@ -19,13 +19,11 @@ public class UltrasonicLocalizer {
 	private EV3LargeRegulatedMotor rightMotor;
 	private TextLCD LCD=LocalEV3.get().getTextLCD();
 	private Odometer odometer;
-	private SampleProvider us;
+	private SampleProvider usDistance;
 	private float[] usData;
 
 	private static final int ROTATE_SPEED=70;
-	private static final double WHEEL_RADIUS = 2.2;
-	private static final double TRACK = 9.88;
-	private static final int D=50;
+	private static final int D=55;
 	private static int distance;
 	private static int dT;
 	private double thetaA, thetaB;
@@ -40,14 +38,13 @@ public class UltrasonicLocalizer {
 	 * @param us, sample provider
 	 * @param usData, array that collects the data
 	 */
-	public UltrasonicLocalizer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, 
-			Odometer odometer, SampleProvider us, float[] usData) {
-		this.leftMotor=leftMotor;
-		this.rightMotor=rightMotor;
+	public UltrasonicLocalizer(Odometer odometer) {
+		this.leftMotor=Resources.getLeftMotor();
+		this.rightMotor=Resources.getRightMotor();
 		this.odometer=odometer;
 		
-		this.us=us;
-		this.usData=usData;
+		this.usDistance = Resources.getUltrasonicSensor().getMode("Distance");
+		this.usData=new float[usDistance.sampleSize()];;
 
 	}
 
@@ -59,6 +56,7 @@ public class UltrasonicLocalizer {
 	 * it will execute one of the following
 	 */
 	public void doLocalization() {
+		Navigation.setAcceleration(200);
 		//this is a falling edge 
 		fallingEdge();
 	}
@@ -66,7 +64,7 @@ public class UltrasonicLocalizer {
 
 	//collecting data for the distances
 	public int collectData() {
-		us.fetchSample(usData, 0);
+		usDistance.fetchSample(usData, 0);
 		distance = (int) (usData[0] *100);//takes value from the buffer in cm
 		
 		if(distance>D) {
@@ -75,78 +73,21 @@ public class UltrasonicLocalizer {
 		return distance;
 	}
 
-	/**
-	 * Method that detects the rising edge, from where the value for the distance is small, and then becomes very large
-	 * since there are no wall detected anymore.
-	 * this is the rising point. It uses the rising edge to localize itself in space and time and redirect itself,
-	 * to the 0 degree angle, facing the positive y-axis
-	 * @return nothing
-	 */
-	public void risingEdge() {
-		
-		leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
-		
-		//rotate clockwise, until it sees the wall
-		while(collectData()==D) {
-			leftMotor.forward();
-			rightMotor.backward();
-		}
-		//continue until it doesn't see the wall
-		leftMotor.forward();
-		rightMotor.backward();
-		
-		boolean isTurning=true;
-		while(isTurning) {
-			if(collectData()==D) {
-				leftMotor.stop(true);
-				rightMotor.stop(false);
-				isTurning=false;
-			}
-		}
-		Sound.beep();
-
-
-		thetaA=odometer.getThetaDegrees();
-		thetaA=normalizeTheta(thetaA);
-		Sound.beep();
-		
-		//change direction until it doesn't see the wall
 	
-		while(collectData()==D) {
-			leftMotor.backward();
+	public void reverseIntoWall() {
+		Navigation.setSpeed(ROTATE_SPEED + 100, ROTATE_SPEED + 100);
+		
+		//rotate clockwise until it sees no wall
+		while(collectData()<D) {
+			System.out.println(collectData());
 			rightMotor.forward();
+			leftMotor.backward();
 		}
-		//keep rotation until robot sees the wall, note down the angel
-		leftMotor.backward();
-		rightMotor.forward();
 		
-		isTurning=true;
-		
-		while(isTurning){
-			if(collectData()==D) {
-				leftMotor.stop(true);
-				rightMotor.stop(false);
-				isTurning=false;
-			}
-		}
-		Sound.beep();
-		thetaB=odometer.getThetaDegrees();
-		thetaB=normalizeTheta(thetaB);
-		
-		if(thetaA<thetaB) {
-			dT= 45-(int) (thetaA+thetaB)/2;
-		}
-		else if(thetaA>thetaB) {
-			dT=225-(int) ((thetaA + thetaB) /2);
-		}
-		double currentTheta= odometer.getThetaDegrees();
-		double newtheta= dT+currentTheta;
-		odometer.setTheta(newtheta);
-		turnTo(-newtheta+20);
-		//odometer.setTheta(0);
+		Navigation.driveDistance(20, false);
 	}
-
+	
+	
 	/**
 	 * Method that uses the falling edge, where the distance seen by the robot is very large, as it is facing no wall,
 	 * and falling as it turns and finds a wall. This is the falling point
@@ -156,7 +97,7 @@ public class UltrasonicLocalizer {
 	 * @return nothing
 	 */
 	public void fallingEdge() {
-		
+//		Navigation.turnTo(-360, false);
 		//set rotation speed
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
@@ -212,22 +153,25 @@ public class UltrasonicLocalizer {
 		}
 		else if(thetaA<thetaB) {
 			dT= 225-(int) (thetaA+thetaB)/2;
-		}
+		} 
 		System.out.println("ThetaA: " + thetaA);
 		System.out.println("ThetaB: " + thetaB);
 		System.out.println("dT: " + dT);
 		double currentTheta= odometer.getThetaDegrees();
+
 		System.out.println("currentTheta: " + currentTheta);
 		double newtheta=currentTheta+dT;
 		System.out.println("newtheta: " + newtheta);
 		odometer.setTheta(newtheta);
 		if (newtheta > 180) {
-			turnTo(360 - newtheta);
+			Navigation.turnTo(360 - newtheta, false);
 		} else {
-			turnTo(-newtheta);
+			Navigation.turnTo(-newtheta, false);
 		}
 		odometer.setPosition(new double [] {0, 0, 0}, 
 				new boolean [] {true, true, true});
+		
+		Navigation.driveDistance(10, false);
 	}
 	
 	/**
@@ -244,45 +188,6 @@ public class UltrasonicLocalizer {
 			theta = theta +360;
 		}
 		return theta;
-	}
-
-	/**
-	 *  Method that causes the robot to turn on itself to the absolute heading theta. 
-	 * This method should turn a MINIMAL angle to its target.
-	 * @param theta
-	 * @return Nothing
-	 */
-	void turnTo(double theta) {
-		leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
-	
-		leftMotor.rotate(angleConvert(WHEEL_RADIUS,TRACK,theta),true);
-		rightMotor.rotate(-angleConvert(WHEEL_RADIUS,TRACK,theta),false);
-		
-	}
-
-	/**
-	 * Method returns the number of tachocount it need to travel a certain distance
-	 * Calculates the tachocount from the radius of the wheel
-	 * @param radius
-	 * @param distance
-	 * @return
-	 */
-	public static int distanceConvert(double radius, double distance) {
-		return(int) (distance*180/Math.PI/radius);
-	}
-
-
-	/**
-	 * This method converts the angle into the number of tachocount it need to turn for this degree
-	 * @param radius
-	 * @param width
-	 * @param angle
-	 * @return an integer that is the distance
-	 */
-	private static int angleConvert(double radius, double width, double angle) {
-
-		return distanceConvert(radius, Math.PI * width * angle / 360.0);
 	}
 
 	/**

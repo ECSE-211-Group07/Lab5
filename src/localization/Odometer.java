@@ -18,21 +18,16 @@ public class Odometer extends Thread {
 	private static final long ODOMETER_PERIOD = 25;
 	
 	// circumference of our wheel given a radius of 2.1cm
-	private static final double WHEEL_CIRCUM = Math.PI*4.2;
+	private static final double WHEEL_CIRCUM = Math.PI*2*Resources.getRadius();
 
 	// lock object for mutual exclusion
 	public Object lock;
 
-	
-	/** Constructs Odometer
-	 * @param leftMotor motor which robot will use to guide left wheel
-	 * @param rightMotor motor which robot will use to guide right wheel
-	 * @param track distance between left and right wheel
-	 */
-	public Odometer(EV3LargeRegulatedMotor leftMotor,EV3LargeRegulatedMotor rightMotor, double track) {
-		this.leftMotor = leftMotor;
-		this.rightMotor = rightMotor;
-		this.track = track;
+	// default constructor
+	public Odometer() {
+		this.leftMotor = Resources.getLeftMotor();
+		this.rightMotor = Resources.getRightMotor();
+		this.track = Resources.getTrack();
 		this.x = 0.0;
 		this.y = 0.0;
 		this.theta = 0.0;

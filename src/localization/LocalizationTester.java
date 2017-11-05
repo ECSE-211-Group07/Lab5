@@ -12,28 +12,13 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 public class LocalizationTester {
-	private static final EV3LargeRegulatedMotor leftMotor = 
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final EV3LargeRegulatedMotor rightMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port usPort = LocalEV3.get().getPort("S1");
-	private static final EV3ColorSensor lightSensor = new EV3ColorSensor(LocalEV3.get().getPort("S4"));
 	
 	public static void main(String[] args) {
-		
-		SensorModes usSensor = new EV3UltrasonicSensor(usPort); // usSensor is the instance
-		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
-		// this instance
-		float[] usData = new float[usDistance.sampleSize()];
-		
-		SensorModes colorMode = lightSensor;
-		SampleProvider colorSensor = colorMode.getMode("Red");
-		float[] colorData = new float[colorMode.sampleSize()];
-		
+		Resources resources = new Resources("A", "D", "B", "S4", "S1");
 		final TextLCD t=LocalEV3.get().getTextLCD();
-		Odometer odometer = new Odometer(leftMotor, rightMotor, Resources.getTrack());
+		Odometer odometer = new Odometer();
 		OdometryDisplay odometryDisplay=new OdometryDisplay(odometer,t);
-		UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(leftMotor, rightMotor, odometer, usDistance, usData);
+		UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(odometer);
 		
 		
 		int buttonChoice;

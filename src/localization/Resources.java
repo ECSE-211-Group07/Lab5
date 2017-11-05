@@ -4,6 +4,8 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.hardware.sensor.SensorModes;
+import lejos.robotics.SampleProvider;
 
 
 /** Resources allows us to keep all the interfaces to our external hardware components in one place
@@ -17,8 +19,14 @@ public class Resources {
 	private static EV3UltrasonicSensor ultrasonicSensor;
 	private static EV3ColorSensor lightSensor;
 	private static Odometer odometer;
+<<<<<<< HEAD
 	private static final double TRACK = 12.25;
 	private static final double RADIUS = 2.1;
+=======
+	private static OdometryDisplay odometryDisplay;
+	private static final double TRACK = 10.10;
+	private static final double RADIUS = 2.093;
+>>>>>>> 38d13664c5eae145ee5e4345e8069cd95c091455
 	
 	/**
 	 * Initializes a class used to hold any potential constants required by multiple classes
@@ -37,7 +45,10 @@ public class Resources {
 		zipMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort(zipMotorPort));
 		lightSensor = new EV3ColorSensor(LocalEV3.get().getPort(lightSensorPort));
 		ultrasonicSensor = new EV3UltrasonicSensor(LocalEV3.get().getPort(ultrasonicSensorPort));
-		odometer = new Odometer(leftMotor, rightMotor, TRACK);
+		SensorModes usSensor = ultrasonicSensor; // usSensor is the instance
+		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
+		// this instance
+		float[] usData = new float[usDistance.sampleSize()];
 	}
 	
 	/**
