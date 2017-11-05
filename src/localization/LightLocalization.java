@@ -19,12 +19,14 @@ import lejos.robotics.SampleProvider;
  */
 public class LightLocalization {
 	private Odometer odometer;
-	private Navigation navigation;
 	private static double SENSOR_DISTANCE = 24;//18
 	double [] lightData;
 	
 	private SampleProvider colorSensor;
 	private float[] colorData;
+	
+	private EV3LargeRegulatedMotor leftMotor;
+	private EV3LargeRegulatedMotor rightMotor;
 
 	/** Constructor for LightLocalization object that allows EV3 Robot to localize about a point (x, y) 
 	 *  using a light sensor and basic trigonometry 
@@ -34,12 +36,13 @@ public class LightLocalization {
 	 * @param navigator navigator that LightLocalization object will use to travel and turn
 	 */
 	public LightLocalization(Odometer odometer, SampleProvider colorSensor,
-						  float[] colorData, Navigation navigator) {
+						  float[] colorData) {
 		this.odometer = odometer;
-		this.navigation = navigator;
 		this.lightData = new double [5];
 		this.colorSensor = colorSensor;
 		this.colorData = colorData;
+		this.leftMotor = Resources.getLeftMotor();
+		this.rightMotor = Resources.getRightMotor();
 	}
 
 	/** Localizes about a point (x, y) by calling subsequent helper functions
@@ -58,12 +61,12 @@ public class LightLocalization {
 		
 		
 		// travel to 0,0 then turn to the 0 angle
-		navigation.travelTo(x, y);
+		Navigation.travelTo(x, y);
 		
 		// Corrects theta value
-		navigation.turnTo(-50, false);
+		Navigation.turnTo(-50, false);
 		
-		// navigation.setSpeed(0,0);
+		// Navigation.setSpeed(0,0);
 	}
 	
 	
@@ -71,9 +74,9 @@ public class LightLocalization {
 	 * which the point was encoutered at
 	 */
 	private void rotateLightSensor() {
-		navigation.turnTo(-360, true);
+		Navigation.turnTo(-360, true);
 		int lineIndex=1;
-		while(navigation.isNavigating()) {
+		while(Navigation.isNavigating()) {
 			colorSensor.fetchSample(colorData, 0);
 			if(colorData[0] < 0.25 && lineIndex < 5) {
 				lightData[lineIndex]=odometer.getThetaDegrees();

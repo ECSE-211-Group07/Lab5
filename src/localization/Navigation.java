@@ -12,8 +12,10 @@ import localization.Odometer;
  */
 public class Navigation {
 	
-	private static Odometer odometer;
-	private static EV3LargeRegulatedMotor leftMotor, rightMotor, zipMotor;
+	private static Odometer odometer = Resources.getOdometer();
+	private static EV3LargeRegulatedMotor leftMotor = Resources.getLeftMotor();
+	private static EV3LargeRegulatedMotor rightMotor = Resources.getRightMotor();
+	private static EV3LargeRegulatedMotor zipMotor = Resources.getZipMotor();
 	private static final double RADIUS = Resources.getRadius();
 	private static final double TRACK = Resources.getTrack();
 
@@ -27,12 +29,6 @@ public class Navigation {
 	 * @param rightmotor 
 	 * @param leftmotor 
 	 */
-	public Navigation() {
-		this.leftMotor = Resources.getLeftMotor();
-		this.rightMotor = Resources.getRightMotor();
-		this.odometer = Resources.getOdometer();
-		this.zipMotor = Resources.getZipMotor();
-	}
 	
 
 	/**
@@ -68,7 +64,7 @@ public class Navigation {
 		// move to the next point
 		leftMotor.setSpeed(FORWARD_SPEED);
 		rightMotor.setSpeed(FORWARD_SPEED);
-		leftMotor.rotate(convertDistance(RADIUS,distance), true);
+		leftMotor.rotate(convertDistance(RADIUS,distance), false);
 		rightMotor.rotate(convertDistance(RADIUS, distance), false);
 
 		leftMotor.stop(true);
@@ -88,7 +84,7 @@ public class Navigation {
 		rightMotor.setSpeed(ROTATE_SPEED);
 		int angle = convertAngle(RADIUS, TRACK, theta);
 		
-		leftMotor.rotate(angle, true);
+		leftMotor.rotate(angle, block);
 		rightMotor.rotate(-angle, block);
 
 	}
@@ -120,10 +116,10 @@ public class Navigation {
 	 */
 	public static void driveDistance(int distance, boolean forward) {
 		if (forward) {
-			leftMotor.rotate(convertDistance(RADIUS, distance), true);
+			leftMotor.rotate(convertDistance(RADIUS, distance), false);
 			rightMotor.rotate(convertDistance(RADIUS, distance), false);
 		} else {
-			leftMotor.rotate(-convertDistance(RADIUS, distance), true);
+			leftMotor.rotate(-convertDistance(RADIUS, distance), false);
 			rightMotor.rotate(-convertDistance(RADIUS, distance), false);
 		}
 

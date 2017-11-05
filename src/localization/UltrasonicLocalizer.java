@@ -44,7 +44,7 @@ public class UltrasonicLocalizer {
 		this.odometer=odometer;
 		
 		this.usDistance = Resources.getUltrasonicSensor().getMode("Distance");
-		this.usData=new float[usDistance.sampleSize()];;
+		this.usData=new float[usDistance.sampleSize()];
 
 	}
 

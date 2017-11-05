@@ -20,7 +20,7 @@ public class Resources {
 	private static EV3ColorSensor lightSensor;
 	private static Odometer odometer;
 	private static OdometryDisplay odometryDisplay;
-	private static final double TRACK = 10.10;
+	private static final double TRACK = 10.2;
 	private static final double RADIUS = 2.093;
 
 	
@@ -45,6 +45,7 @@ public class Resources {
 		SampleProvider usDistance = usSensor.getMode("Distance"); // usDistance provides samples from
 		// this instance
 		float[] usData = new float[usDistance.sampleSize()];
+		odometer = new Odometer();
 	}
 	
 	/**
