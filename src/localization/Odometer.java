@@ -2,6 +2,11 @@ package localization;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/** Odometer uses the number of wheel rotations the robot has completed, along with some simple trigonometry to
+ * determine the robot's x, y, and theta coordinates.
+ * @author Marine Huynh, Sihui Shen
+ *
+ */
 public class Odometer extends Thread {
 	//ALL DISTANCE VALUES ARE IN CM,THETA IN RAD-> CONVERT TO DEGREES
 	// robot position
@@ -88,7 +93,7 @@ public class Odometer extends Thread {
 		}
 	}
 
-	// accessors
+	
 	public void getPosition(double[] position, boolean[] update) {
 		// ensure that the values don't change while the odometer is running
 		synchronized (lock) {
@@ -105,6 +110,9 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/** Returns class variable x
+	 * @return
+	 */
 	public double getX() {
 		double result;
 
@@ -115,6 +123,9 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/** Returns class variable y
+	 * @return
+	 */
 	public double getY() {
 		double result;
 
@@ -125,6 +136,9 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/** Returns class variable theta in radians
+	 * @return
+	 */
 	public double getTheta() {
 		double result;
 
@@ -135,6 +149,9 @@ public class Odometer extends Thread {
 		return result;
 	}
 	
+	/** Returns class variable theta in degrees ensuring it is in the range [0, 360)
+	 * @return
+	 */
 	public double getThetaDegrees() {
 		double result;
 
@@ -149,7 +166,11 @@ public class Odometer extends Thread {
 		return result;
 	}
 
-	// mutators
+	
+	/** Updates x, y, and theta in one function call
+	 * @param position array containing x, y, and theta
+	 * @param update
+	 */
 	public void setPosition(double[] position, boolean[] update) {
 		// ensure that the values don't change while the odometer is running
 		synchronized (lock) {
@@ -162,18 +183,29 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/** Sets class variable x to desired coordinate in cm relative to x = 0
+	 * @param x desired x
+	 */
 	public void setX(double x) {
 		synchronized (lock) {
 			this.x = x;
 		}
 	}
-
+	
+	
+	/** Sets class variable y to desired coordinate in cm relative to y = 0
+	 * @param y desired y
+	 */
 	public void setY(double y) {
 		synchronized (lock) {
 			this.y = y;
 		}
 	}
-
+	
+	
+	/** Sets theta class variable to desired angle in degrees
+	 * @param theta desired theta
+	 */
 	public void setTheta(double theta) {
 		synchronized (lock) {
 			this.theta = theta;

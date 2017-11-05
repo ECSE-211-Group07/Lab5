@@ -8,6 +8,10 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 
+/** Resources allows us to keep all the interfaces to our external hardware components in one place
+ * @author Ali Shobeiri
+ *
+ */
 public class Resources {
 	private static EV3LargeRegulatedMotor leftMotor;
 	private static EV3LargeRegulatedMotor rightMotor;

@@ -6,6 +6,11 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 import localization.Odometer;
 
+/** Navigation uses simple trigonometry along with information obtained from the odometer to be able to 
+ * allow the robot to travel to certain x and y coordinates, or turn a specified number of degrees
+ * @author Marine Huynh, Sihui Shen
+ *
+ */
 public class Navigation {
 	
 	private static Odometer odometer;

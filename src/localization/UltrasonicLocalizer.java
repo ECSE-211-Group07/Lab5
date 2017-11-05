@@ -8,6 +8,11 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.SampleProvider;
 
 
+/** UltrasonicLocalizer uses an ultrasonic sensor to detect walls surrounding the robot which ultimately
+ * allows the robot to localize itself to theta = 0
+ * @author Marine Hunyh, Sihui Shen
+ *
+ */
 public class UltrasonicLocalizer {
 	
 	private EV3LargeRegulatedMotor leftMotor;

@@ -12,6 +12,11 @@ import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.Color;
 import lejos.robotics.SampleProvider;
 
+/** LightLocaliztion uses one light sensor to detect lines around the robot and ultimately precisely travel to 
+ * a given coordinate.
+ * @author Adam Gobran, Ali Shobeiri, Abe Yesgat, Reda El Khili
+ *
+ */
 public class LightLocalization {
 	private Odometer odometer;
 	private Navigation navigation;
@@ -21,6 +26,13 @@ public class LightLocalization {
 	private SampleProvider colorSensor;
 	private float[] colorData;
 
+	/** Constructor for LightLocalization object that allows EV3 Robot to localize about a point (x, y) 
+	 *  using a light sensor and basic trigonometry 
+	 * @param odometer odometer that LightLocalization object will use
+	 * @param colorSensor color sensor that LightLocalization object will use
+	 * @param colorData colorData array of light sensor values that LightLocalization object will use
+	 * @param navigator navigator that LightLocalization object will use to travel and turn
+	 */
 	public LightLocalization(Odometer odometer, SampleProvider colorSensor,
 						  float[] colorData, Navigation navigator) {
 		this.odometer = odometer;
@@ -30,6 +42,10 @@ public class LightLocalization {
 		this.colorData = colorData;
 	}
 
+	/** Localizes about a point (x, y) by calling subsequent helper functions
+	 * @param x x coordinate relative to x = 0 to localize about
+	 * @param y y coordinate relative to y = 0 to localize about
+	 */
 	public void doLocalization(double x, double y) {
 
 		// goToApproxOrigin();
@@ -68,8 +84,10 @@ public class LightLocalization {
 	}
 	
 	
-	/**
-	 * Uses mathematical calculations to compute the correct robot position
+	
+	/** Uses mathematical calculations to compute the correct robot position
+	 * @param x x value relative to x = 0 for which robot should correct its position towards
+	 * @param y y value relative to y = 0 for which robot should correct its position towards
 	 */
 	private void correctPosition(double x, double y) {
 		//compute difference in angles

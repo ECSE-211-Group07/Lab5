@@ -14,8 +14,7 @@ import lejos.robotics.SampleProvider;
 /**
  * LocalizationLab uses a system to localize the robot using the ultrasonic sensor and the light sensor
  * the robot moves and it calculates its position. It can then be places on the (0,0) origin on the grid
- * @author Marine Huynh
- * @author Sihui Shen
+ * @author Marine Huynh, Sihui Shen, Adam Gobran, Ali Shobeiri, Abe Yesgat, Reda El Khili
  * @since 10-04-2017
  *
  */
@@ -236,7 +235,7 @@ public class LocalizationLab {
 
 	/**
 	 * setter for the falling edge
-	 * @param isFallingEdge
+	 * @param isFallingEdge boolean that represents if we are using falling or rising edge localization method
 	 * @return nothing
 	 */
 	public static void setFallingEdge(boolean isFallingEdge) {
