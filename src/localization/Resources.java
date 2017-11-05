@@ -19,14 +19,10 @@ public class Resources {
 	private static EV3UltrasonicSensor ultrasonicSensor;
 	private static EV3ColorSensor lightSensor;
 	private static Odometer odometer;
-<<<<<<< HEAD
-	private static final double TRACK = 12.25;
-	private static final double RADIUS = 2.1;
-=======
 	private static OdometryDisplay odometryDisplay;
 	private static final double TRACK = 10.10;
 	private static final double RADIUS = 2.093;
->>>>>>> 38d13664c5eae145ee5e4345e8069cd95c091455
+
 	
 	/**
 	 * Initializes a class used to hold any potential constants required by multiple classes
