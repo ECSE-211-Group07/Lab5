@@ -79,7 +79,6 @@ public class UltrasonicLocalizer {
 		
 		//rotate clockwise until it sees no wall
 		while(collectData()<D) {
-			System.out.println(collectData());
 			rightMotor.forward();
 			leftMotor.backward();
 		}
@@ -154,14 +153,9 @@ public class UltrasonicLocalizer {
 		else if(thetaA<thetaB) {
 			dT= 225-(int) (thetaA+thetaB)/2;
 		} 
-		System.out.println("ThetaA: " + thetaA);
-		System.out.println("ThetaB: " + thetaB);
-		System.out.println("dT: " + dT);
 		double currentTheta= odometer.getThetaDegrees();
 
-		System.out.println("currentTheta: " + currentTheta);
 		double newtheta=currentTheta+dT;
-		System.out.println("newtheta: " + newtheta);
 		odometer.setTheta(newtheta);
 		if (newtheta > 180) {
 			Navigation.turnTo(360 - newtheta, false);

@@ -19,7 +19,7 @@ import lejos.robotics.SampleProvider;
  */
 public class LightLocalization {
 	private Odometer odometer;
-	private static double SENSOR_DISTANCE = 24;//18
+	private static double SENSOR_DISTANCE = 14;//18
 	double [] lightData;
 	
 	private SampleProvider colorSensor;
@@ -63,9 +63,6 @@ public class LightLocalization {
 		// travel to 0,0 then turn to the 0 angle
 		Navigation.travelTo(x, y);
 		
-		// Corrects theta value
-		Navigation.turnTo(-50, false);
-		
 		// Navigation.setSpeed(0,0);
 	}
 	
@@ -100,11 +97,9 @@ public class LightLocalization {
 		//use trig to determine position of the robot 
 		double Xnew = (x * 30.48)-SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaY) / 2);
 		double Ynew = (y * 30.48)-SENSOR_DISTANCE*Math.cos(Math.toRadians(deltaThetaX) / 2);
-		System.out.println("Xnew :" + Xnew); //7.5, 0.5
-		System.out.println("Ynew :" + Ynew);
 		
 		odometer.setPosition(new double [] {Xnew, Ynew, 0}, 
-					new boolean [] {true, true, true});
+					new boolean [] {true, true, false});
 
 	}
 }

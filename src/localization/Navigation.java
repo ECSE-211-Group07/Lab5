@@ -64,7 +64,7 @@ public class Navigation {
 		// move to the next point
 		leftMotor.setSpeed(FORWARD_SPEED);
 		rightMotor.setSpeed(FORWARD_SPEED);
-		leftMotor.rotate(convertDistance(RADIUS,distance), false);
+		leftMotor.rotate(convertDistance(RADIUS,distance), true);
 		rightMotor.rotate(convertDistance(RADIUS, distance), false);
 
 		leftMotor.stop(true);
@@ -84,7 +84,7 @@ public class Navigation {
 		rightMotor.setSpeed(ROTATE_SPEED);
 		int angle = convertAngle(RADIUS, TRACK, theta);
 		
-		leftMotor.rotate(angle, block);
+		leftMotor.rotate(angle, true);
 		rightMotor.rotate(-angle, block);
 
 	}
@@ -96,7 +96,9 @@ public class Navigation {
 	 * @param theta The final orientation desired
 	 */
 	public static void pointTo(double theta) {
-		turnTo(theta - odometer.getThetaDegrees(), false);
+		double angleToTurn = theta - odometer.getThetaDegrees();
+		System.out.println("Angle to turn: " + angleToTurn % 360);
+		turnTo(angleToTurn % 360, false);
 	}
 	
 	
@@ -116,10 +118,10 @@ public class Navigation {
 	 */
 	public static void driveDistance(int distance, boolean forward) {
 		if (forward) {
-			leftMotor.rotate(convertDistance(RADIUS, distance), false);
+			leftMotor.rotate(convertDistance(RADIUS, distance), true);
 			rightMotor.rotate(convertDistance(RADIUS, distance), false);
 		} else {
-			leftMotor.rotate(-convertDistance(RADIUS, distance), false);
+			leftMotor.rotate(-convertDistance(RADIUS, distance), true);
 			rightMotor.rotate(-convertDistance(RADIUS, distance), false);
 		}
 
@@ -211,6 +213,8 @@ public class Navigation {
 	public static void driveZipline() {
 		leftMotor.setAcceleration(60);
 		rightMotor.setAcceleration(60);
+		leftMotor.setSpeed(300);
+		rightMotor.setSpeed(300);
 		zipMotor.setSpeed(350);
 		zipMotor.backward();
 
